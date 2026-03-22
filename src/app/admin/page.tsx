@@ -90,24 +90,28 @@ export default async function AdminDashboard() {
       if (b.paymentStatus === "paid") monthlyMap[key].revenue += Number(b.totalAmount || 0);
     }
   }
-  const monthly = Object.entries(monthlyMap).map(([key, v]) => {
+  const monthly = Object.entries(monthlyMap).map(([key, v]: [string, { revenue: number; bookings: number }]) => {
     const [, month] = key.split("-").map(Number);
     return { month: MONTH_LABELS[month], revenue: v.revenue, bookings: v.bookings };
   });
 
-  const statusBreakdown = [
+  type StatusCard = { label: string; count: number; color: string };
+  type TopPropertyRaw = typeof topPropertiesRaw[number];
+  type PropDetail = { id: string; title: string };
+
+  const statusBreakdown = ([
     { label: "Confirmed", count: confirmedBookings, color: "#22c55e" },
     { label: "Pending",   count: pendingBookings,   color: "#f59e0b" },
     { label: "Completed", count: completedBookings, color: "#3b82f6" },
     { label: "Cancelled", count: cancelledBookings, color: "#ef4444" },
-  ].filter(s => s.count > 0);
+  ] as StatusCard[]).filter((s: StatusCard) => s.count > 0);
 
-  const propIds = topPropertiesRaw.map(p => p.propertyId);
-  const propDetails = propIds.length
+  const propIds = topPropertiesRaw.map((p: TopPropertyRaw) => p.propertyId);
+  const propDetails: PropDetail[] = propIds.length
     ? await prisma.property.findMany({ where: { id: { in: propIds } }, select: { id: true, title: true } })
     : [];
-  const propMap = Object.fromEntries(propDetails.map(p => [p.id, p.title]));
-  const topProperties = topPropertiesRaw.map(p => ({
+  const propMap = Object.fromEntries(propDetails.map((p: PropDetail) => [p.id, p.title]));
+  const topProperties = topPropertiesRaw.map((p: TopPropertyRaw) => ({
     title: propMap[p.propertyId] ?? "Unknown",
     bookings: p._count.id,
     revenue: Number(p._sum.totalAmount || 0),
