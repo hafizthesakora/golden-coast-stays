@@ -93,7 +93,7 @@ export default async function PropertyDetailsPage({ params }: { params: Promise<
     <PropertyDetailsClient
       property={serialize(property)}
       similar={serialize(similar)}
-      bookedRanges={bookings.map((b) => ({
+      bookedRanges={bookings.map((b: { checkIn: Date; checkOut: Date }) => ({
         start: b.checkIn.toISOString().split("T")[0],
         end: b.checkOut.toISOString().split("T")[0],
       }))}
