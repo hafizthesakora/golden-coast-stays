@@ -100,7 +100,7 @@ export default async function OwnerDashboard() {
   ].filter((s) => s.count > 0);
 
   // ── Top properties by revenue ─────────────────────────────────────────────
-  const propertyRevenue = properties.map((p) => ({
+  const propertyRevenue = properties.map((p: typeof properties[number]) => ({
     title: p.title,
     bookings: p.bookings.length,
     revenue: p.bookings

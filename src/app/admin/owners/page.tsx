@@ -30,7 +30,7 @@ export default async function AdminOwnersPage() {
 
   const now = new Date();
 
-  const enriched = owners.map((owner) => {
+  const enriched = owners.map((owner: typeof owners[number]) => {
     const allBookings = owner.ownedProperties.flatMap((p) => p.bookings);
     const paidBookings = allBookings.filter((b) => b.paymentStatus === "paid");
     const refundedBookings = allBookings.filter((b) => b.paymentStatus === "refunded");

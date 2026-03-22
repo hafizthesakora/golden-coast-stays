@@ -79,7 +79,7 @@ export default async function OwnerRevenuePage() {
 
   // ── Property revenue breakdown ────────────────────────────────────────────
   const propertyBreakdown = properties
-    .map((p) => {
+    .map((p: typeof properties[number]) => {
       const paidBookings = p.bookings.filter((b) => b.paymentStatus === "paid");
       const revenue = paidBookings.reduce((s, b) => s + Number(b.totalAmount), 0);
       return {
@@ -95,7 +95,7 @@ export default async function OwnerRevenuePage() {
 
   // ── Recent paid transactions ───────────────────────────────────────────────
   const recentTransactions = serialize(
-    allBookings.slice(0, 20).map((b) => {
+    allBookings.slice(0, 20).map((b: typeof allBookings[number]) => {
       const prop = properties.find((p) => p.id === b.propertyId);
       return { ...b, propertyTitle: prop?.title ?? "Unknown Property" };
     })

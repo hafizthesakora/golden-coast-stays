@@ -98,7 +98,7 @@ export default async function AdminReportsPage() {
     pending:   "#f59e0b",
     cancelled: "#ef4444",
   };
-  const statusBreakdown = statusGroups.map((g) => ({
+  const statusBreakdown = statusGroups.map((g: typeof statusGroups[number]) => ({
     label: g.status,
     count: g._count._all,
     color: statusColorMap[g.status] ?? "#6c757d",
@@ -106,7 +106,7 @@ export default async function AdminReportsPage() {
 
   // ── Top properties ────────────────────────────────────────────────────────
   const topProperties = propertiesRaw
-    .map((p) => {
+    .map((p: typeof propertiesRaw[number]) => {
       const paid = p.bookings.filter((b) => b.paymentStatus === "paid");
       const revenue = paid.reduce((s, b) => s + Number(b.totalAmount), 0);
       const active = p.bookings.filter((b) => b.status !== "cancelled");
@@ -122,7 +122,7 @@ export default async function AdminReportsPage() {
     .slice(0, 10);
 
   // ── Owner performance ─────────────────────────────────────────────────────
-  const owners = ownersRaw.map((o) => {
+  const owners = ownersRaw.map((o: typeof ownersRaw[number]) => {
     const allB = o.ownedProperties.flatMap((p) => p.bookings);
     const gross = allB.filter((b) => b.paymentStatus === "paid").reduce((s, b) => s + Number(b.totalAmount), 0);
     const refunded = allB.filter((b) => b.paymentStatus === "refunded").reduce((s, b) => s + Number(b.totalAmount), 0);
