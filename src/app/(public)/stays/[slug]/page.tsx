@@ -84,7 +84,7 @@ export default async function PropertyDetailsPage({ params }: { params: Promise<
   }
 
   const avgRating = property.reviews.length
-    ? property.reviews.reduce((s: number, r) => s + r.rating, 0) / property.reviews.length
+    ? property.reviews.reduce((s: number, r: { rating: number }) => s + r.rating, 0) / property.reviews.length
     : null;
 
   const flags = await getSettings(["feature_reviews", "feature_booking"]);
