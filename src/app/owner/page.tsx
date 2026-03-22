@@ -100,12 +100,15 @@ export default async function OwnerDashboard() {
   ].filter((s) => s.count > 0);
 
   // ── Top properties by revenue ─────────────────────────────────────────────
-  const propertyRevenue = properties.map((p: typeof properties[number]) => ({
+  type OwnerPageProperty = typeof properties[number];
+  type OwnerPageBooking = OwnerPageProperty["bookings"][number];
+
+  const propertyRevenue = properties.map((p: OwnerPageProperty) => ({
     title: p.title,
     bookings: p.bookings.length,
     revenue: p.bookings
-      .filter((b) => b.paymentStatus === "paid")
-      .reduce((s, b) => s + Number(b.totalAmount), 0),
+      .filter((b: OwnerPageBooking) => b.paymentStatus === "paid")
+      .reduce((s: number, b: OwnerPageBooking) => s + Number(b.totalAmount), 0),
   }));
 
   const recentBookings = serialize(allBookings.slice(0, 8));

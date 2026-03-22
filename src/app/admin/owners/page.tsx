@@ -30,17 +30,22 @@ export default async function AdminOwnersPage() {
 
   const now = new Date();
 
-  const enriched = owners.map((owner: typeof owners[number]) => {
-    const allBookings = owner.ownedProperties.flatMap((p) => p.bookings);
-    const paidBookings = allBookings.filter((b) => b.paymentStatus === "paid");
-    const refundedBookings = allBookings.filter((b) => b.paymentStatus === "refunded");
-    const grossRevenue = paidBookings.reduce((s, b) => s + Number(b.totalAmount), 0);
-    const refundedAmount = refundedBookings.reduce((s, b) => s + Number(b.totalAmount), 0);
+  type OwnerWithRel = typeof owners[number];
+  type OwnedProperty = OwnerWithRel["ownedProperties"][number];
+  type PropertyBooking = OwnedProperty["bookings"][number];
+  type Submission = OwnerWithRel["submissions"][number];
+
+  const enriched = owners.map((owner: OwnerWithRel) => {
+    const allBookings = owner.ownedProperties.flatMap((p: OwnedProperty) => p.bookings);
+    const paidBookings = allBookings.filter((b: PropertyBooking) => b.paymentStatus === "paid");
+    const refundedBookings = allBookings.filter((b: PropertyBooking) => b.paymentStatus === "refunded");
+    const grossRevenue = paidBookings.reduce((s: number, b: PropertyBooking) => s + Number(b.totalAmount), 0);
+    const refundedAmount = refundedBookings.reduce((s: number, b: PropertyBooking) => s + Number(b.totalAmount), 0);
     const netRevenue = grossRevenue - refundedAmount;
     const upcomingCount = allBookings.filter(
-      (b) => new Date(b.checkIn) >= now && b.status !== "cancelled"
+      (b: PropertyBooking) => new Date(b.checkIn) >= now && b.status !== "cancelled"
     ).length;
-    const pendingSubs = owner.submissions.filter((s) => s.status === "pending").length;
+    const pendingSubs = owner.submissions.filter((s: Submission) => s.status === "pending").length;
     return { ...owner, grossRevenue, netRevenue, refundedAmount, upcomingCount, pendingSubs, bookingCount: allBookings.length };
   });
 

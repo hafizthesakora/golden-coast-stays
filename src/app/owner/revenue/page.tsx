@@ -78,10 +78,13 @@ export default async function OwnerRevenuePage() {
   ].filter((s) => s.count > 0);
 
   // ── Property revenue breakdown ────────────────────────────────────────────
+  type RevProperty = typeof properties[number];
+  type RevBooking = RevProperty["bookings"][number];
+
   const propertyBreakdown = properties
-    .map((p: typeof properties[number]) => {
-      const paidBookings = p.bookings.filter((b) => b.paymentStatus === "paid");
-      const revenue = paidBookings.reduce((s, b) => s + Number(b.totalAmount), 0);
+    .map((p: RevProperty) => {
+      const paidBookings = p.bookings.filter((b: RevBooking) => b.paymentStatus === "paid");
+      const revenue = paidBookings.reduce((s: number, b: RevBooking) => s + Number(b.totalAmount), 0);
       return {
         id: p.id,
         title: p.title,

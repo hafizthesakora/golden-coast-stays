@@ -105,13 +105,18 @@ export default async function AdminReportsPage() {
   }));
 
   // ── Top properties ────────────────────────────────────────────────────────
+  type RawProperty = typeof propertiesRaw[number];
+  type RawPropertyBooking = RawProperty["bookings"][number];
+  type RawOwner = typeof ownersRaw[number];
+  type RawOwnerProperty = RawOwner["ownedProperties"][number];
+  type RawOwnerBooking = RawOwnerProperty["bookings"][number];
+
   const topProperties = propertiesRaw
-    .map((p: typeof propertiesRaw[number]) => {
-      const paid = p.bookings.filter((b) => b.paymentStatus === "paid");
-      const revenue = paid.reduce((s, b) => s + Number(b.totalAmount), 0);
-      const active = p.bookings.filter((b) => b.status !== "cancelled");
-      // simple occupancy: nights booked / 365
-      const nightsBooked = active.reduce((s, b) => {
+    .map((p: RawProperty) => {
+      const paid = p.bookings.filter((b: RawPropertyBooking) => b.paymentStatus === "paid");
+      const revenue = paid.reduce((s: number, b: RawPropertyBooking) => s + Number(b.totalAmount), 0);
+      const active = p.bookings.filter((b: RawPropertyBooking) => b.status !== "cancelled");
+      const nightsBooked = active.reduce((s: number, b: RawPropertyBooking) => {
         const nights = Math.round((new Date(b.checkOut).getTime() - new Date(b.checkIn).getTime()) / 86400000);
         return s + nights;
       }, 0);
@@ -122,10 +127,10 @@ export default async function AdminReportsPage() {
     .slice(0, 10);
 
   // ── Owner performance ─────────────────────────────────────────────────────
-  const owners = ownersRaw.map((o: typeof ownersRaw[number]) => {
-    const allB = o.ownedProperties.flatMap((p) => p.bookings);
-    const gross = allB.filter((b) => b.paymentStatus === "paid").reduce((s, b) => s + Number(b.totalAmount), 0);
-    const refunded = allB.filter((b) => b.paymentStatus === "refunded").reduce((s, b) => s + Number(b.totalAmount), 0);
+  const owners = ownersRaw.map((o: RawOwner) => {
+    const allB = o.ownedProperties.flatMap((p: RawOwnerProperty) => p.bookings);
+    const gross = allB.filter((b: RawOwnerBooking) => b.paymentStatus === "paid").reduce((s: number, b: RawOwnerBooking) => s + Number(b.totalAmount), 0);
+    const refunded = allB.filter((b: RawOwnerBooking) => b.paymentStatus === "refunded").reduce((s: number, b: RawOwnerBooking) => s + Number(b.totalAmount), 0);
     return {
       name: o.name ?? "—",
       email: o.email,
