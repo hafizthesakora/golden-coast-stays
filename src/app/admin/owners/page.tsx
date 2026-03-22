@@ -49,10 +49,12 @@ export default async function AdminOwnersPage() {
     return { ...owner, grossRevenue, netRevenue, refundedAmount, upcomingCount, pendingSubs, bookingCount: allBookings.length };
   });
 
+  type EnrichedOwner = typeof enriched[number];
+
   const totalOwners = enriched.length;
-  const totalProperties = enriched.reduce((s, o) => s + o.ownedProperties.length, 0);
-  const totalNetRevenue = enriched.reduce((s, o) => s + o.netRevenue, 0);
-  const activeOwners = enriched.filter((o) => o.ownedProperties.length > 0).length;
+  const totalProperties = enriched.reduce((s: number, o: EnrichedOwner) => s + o.ownedProperties.length, 0);
+  const totalNetRevenue = enriched.reduce((s: number, o: EnrichedOwner) => s + o.netRevenue, 0);
+  const activeOwners = enriched.filter((o: EnrichedOwner) => o.ownedProperties.length > 0).length;
 
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%)" }}>
@@ -175,8 +177,8 @@ export default async function AdminOwnersPage() {
                 {/* Properties list */}
                 {owner.ownedProperties.length > 0 && (
                   <div className="divide-y divide-[#f8f9fa]">
-                    {owner.ownedProperties.slice(0, 3).map((prop) => {
-                      const propPaid = prop.bookings.filter((b) => b.paymentStatus === "paid").reduce((s, b) => s + Number(b.totalAmount), 0);
+                    {owner.ownedProperties.slice(0, 3).map((prop: OwnedProperty) => {
+                      const propPaid = prop.bookings.filter((b: PropertyBooking) => b.paymentStatus === "paid").reduce((s: number, b: PropertyBooking) => s + Number(b.totalAmount), 0);
                       return (
                         <div key={prop.id} className="flex items-center justify-between px-6 py-2.5 hover:bg-[#fafafa]">
                           <div className="flex items-center gap-2">
