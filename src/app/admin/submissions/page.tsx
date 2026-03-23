@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import SubmissionsAdminClient from "./SubmissionsAdminClient";
 import type { Metadata } from "next";
@@ -23,11 +24,15 @@ export default async function AdminSubmissionsPage({
   ]);
 
   // Fetch linked users separately to avoid Prisma client cache issues
-  const userIds = [...new Set(submissions.map(s => s.userId).filter(Boolean))] as string[];
-  const users = userIds.length
+  type Submission = typeof submissions[number];
+  type CountRow = typeof counts[number];
+  type UserRow = { id: string; name: string | null; email: string };
+
+  const userIds = [...new Set(submissions.map((s: Submission) => s.userId).filter(Boolean))] as string[];
+  const users: UserRow[] = userIds.length
     ? await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, name: true, email: true } })
     : [];
-  const userMap = Object.fromEntries(users.map(u => [u.id, u]));
+  const userMap = Object.fromEntries(users.map((u: UserRow) => [u.id, u]));
 
   // This month count
   const startOfMonth = new Date();
@@ -35,7 +40,7 @@ export default async function AdminSubmissionsPage({
   startOfMonth.setHours(0, 0, 0, 0);
   const thisMonthCount = await prisma.propertySubmission.count({ where: { createdAt: { gte: startOfMonth } } });
 
-  const enriched = submissions.map(s => ({
+  const enriched = submissions.map((s: Submission) => ({
     ...s,
     priceEstimate: s.priceEstimate ? s.priceEstimate.toString() : null,
     createdAt: s.createdAt.toISOString(),
@@ -43,7 +48,7 @@ export default async function AdminSubmissionsPage({
     user: s.userId ? (userMap[s.userId] ?? null) : null,
   }));
 
-  const countMap = Object.fromEntries(counts.map(c => [c.status, c._count._all]));
+  const countMap = Object.fromEntries(counts.map((c: CountRow) => [c.status, c._count._all]));
   const totalCount = Object.values(countMap).reduce((a, b) => a + b, 0);
 
   return (

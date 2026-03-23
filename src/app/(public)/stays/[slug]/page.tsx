@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { serialize } from "@/lib/utils";
 import { getSettings } from "@/lib/settings";

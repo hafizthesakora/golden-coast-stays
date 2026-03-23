@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import ReportsClient from "./ReportsClient";
 import type { Metadata } from "next";

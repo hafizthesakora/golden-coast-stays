@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import DashboardClient from "./DashboardClient";
@@ -37,15 +38,16 @@ export default async function DashboardPage() {
   ]);
 
   const now = new Date();
-  const upcoming = bookings.filter(b => new Date(b.checkIn) >= now && b.status !== "cancelled").length;
-  const completed = bookings.filter(b => b.status === "completed").length;
+  type DashBooking = typeof bookings[number];
+  const upcoming = bookings.filter((b: DashBooking) => new Date(b.checkIn) >= now && b.status !== "cancelled").length;
+  const completed = bookings.filter((b: DashBooking) => b.status === "completed").length;
 
   return (
     <Suspense>
       <DashboardClient
         user={{ name: dbUser?.name ?? session!.user?.name ?? "Guest", email: dbUser?.email ?? session!.user?.email ?? "", phone: dbUser?.phone ?? "" }}
         bookings={serialize(bookings)}
-        favorites={serialize(favorites.map(f => f.property))}
+        favorites={serialize(favorites.map((f: typeof favorites[number]) => f.property))}
         stats={{ total: bookings.length, upcoming, completed, saved: favorites.length }}
       />
     </Suspense>

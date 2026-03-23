@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -56,7 +57,7 @@ export default async function BookingPage({
       initialCheckIn={sp.check_in || ""}
       initialCheckOut={sp.check_out || ""}
       initialGuests={parseInt(sp.guests || "1")}
-      bookedRanges={bookings.map(b => ({
+      bookedRanges={bookings.map((b: { checkIn: Date; checkOut: Date }) => ({
         start: b.checkIn.toISOString().split("T")[0],
         end: b.checkOut.toISOString().split("T")[0],
       }))}

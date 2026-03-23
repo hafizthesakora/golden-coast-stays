@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
@@ -214,7 +215,7 @@ export default async function AdminDashboard() {
               { label: "Total Bookings", value: totalBookings, sub: `${thisMonthBookings} this month`, trend: bookTrend, icon: Calendar, accent: "#3b82f6", bg: "bg-blue-50" },
               { label: "Properties", value: totalProperties, sub: "Active listings", trend: null, icon: Home, accent: "#8b5cf6", bg: "bg-purple-50" },
               { label: "Guests", value: totalUsers, sub: "Registered users", trend: null, icon: Users, accent: "#10b981", bg: "bg-emerald-50" },
-            ].map(card => (
+            ].map((card) => (
               <div key={card.label} className="bg-white rounded-2xl border border-white/80 p-5 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-10 h-10 rounded-xl ${card.bg} flex items-center justify-center`}>
@@ -322,7 +323,7 @@ export default async function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#f8f9fa]">
-                  {recentBookings.map(b => (
+                  {recentBookings.map((b: typeof recentBookings[number]) => (
                     <tr key={b.id} className="hover:bg-[#fafafa] transition-colors">
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2.5">

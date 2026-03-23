@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import UsersAdminClient from "./UsersAdminClient";
 import type { Metadata } from "next";
@@ -18,7 +19,7 @@ export default async function AdminUsersPage() {
     GROUP BY u.id ORDER BY u."createdAt" DESC
   `;
 
-  const serialized = users.map(u => ({
+  const serialized = users.map((u: typeof users[number]) => ({
     id: u.id, name: u.name, email: u.email, phone: u.phone, role: u.role,
     isSuspended: u.isSuspended,
     lastLoginAt: u.lastLoginAt?.toISOString() ?? null,
