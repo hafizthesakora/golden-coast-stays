@@ -24,15 +24,17 @@ export default async function OwnerPropertiesPage() {
   });
 
   // ── Aggregate stats ──────────────────────────────────────────────────────
+  type PropItem = typeof properties[number];
+  type PropBooking = PropItem["bookings"][number];
   const totalProperties = properties.length;
-  const activeProperties = properties.filter((p) => p.status === "available").length;
-  const totalBookings = properties.reduce((s, p) => s + p.bookings.length, 0);
+  const activeProperties = properties.filter((p: PropItem) => p.status === "available").length;
+  const totalBookings = properties.reduce((s: number, p: PropItem) => s + p.bookings.length, 0);
   const totalRevenue = properties.reduce(
-    (s, p) =>
+    (s: number, p: PropItem) =>
       s +
       p.bookings
-        .filter((b) => b.paymentStatus === "paid")
-        .reduce((ss, b) => ss + Number(b.totalAmount), 0),
+        .filter((b: PropBooking) => b.paymentStatus === "paid")
+        .reduce((ss: number, b: PropBooking) => ss + Number(b.totalAmount), 0),
     0
   );
 

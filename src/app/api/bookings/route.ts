@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
           title: notifTitle,
           body: notifBody,
           type: "success",
-          link: admins.some((a) => a.id === userId) ? "/admin/bookings" : "/owner/bookings",
+          link: admins.some((a: AdminRow) => a.id === userId) ? "/admin/bookings" : "/owner/bookings",
         })),
       });
     }

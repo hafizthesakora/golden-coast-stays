@@ -63,14 +63,15 @@ export default async function OwnerBookingsPage({
   ]);
 
   // ── Stats ────────────────────────────────────────────────────────────────
+  type OwnerBooking = typeof bookings[number];
   const totalRevenue = bookings
-    .filter((b) => b.paymentStatus === "paid")
-    .reduce((s, b) => s + Number(b.totalAmount), 0);
+    .filter((b: OwnerBooking) => b.paymentStatus === "paid")
+    .reduce((s: number, b: OwnerBooking) => s + Number(b.totalAmount), 0);
 
-  const confirmedCount  = bookings.filter((b) => b.status === "confirmed").length;
-  const pendingCount    = bookings.filter((b) => b.status === "pending").length;
-  const completedCount  = bookings.filter((b) => b.status === "completed").length;
-  const cancelledCount  = bookings.filter((b) => b.status === "cancelled").length;
+  const confirmedCount  = bookings.filter((b: OwnerBooking) => b.status === "confirmed").length;
+  const pendingCount    = bookings.filter((b: OwnerBooking) => b.status === "pending").length;
+  const completedCount  = bookings.filter((b: OwnerBooking) => b.status === "completed").length;
+  const cancelledCount  = bookings.filter((b: OwnerBooking) => b.status === "cancelled").length;
 
   const bookingStatusPill = (s: string) => {
     const map: Record<string, string> = {

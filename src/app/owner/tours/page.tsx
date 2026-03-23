@@ -24,7 +24,8 @@ export default async function OwnerToursPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  const hasTourCount = properties.filter((p) => p.hasVirtualTour).length;
+  type TourProperty = typeof properties[number];
+  const hasTourCount = properties.filter((p: TourProperty) => p.hasVirtualTour).length;
 
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%)" }}>
