@@ -36,7 +36,7 @@ export default async function BookingPage({
           id: true, reference: true, checkIn: true, checkOut: true,
           guests: true, guestName: true, guestEmail: true, guestPhone: true, specialRequests: true,
         },
-      }).then(b => (b && b.id ? b : null))
+      }).then((b: { id: string; reference: string; checkIn: Date; checkOut: Date; guests: number; guestName: string | null; guestEmail: string | null; guestPhone: string | null; specialRequests: string | null } | null) => (b && b.id ? b : null))
     : null;
 
   // Get booked ranges (exclude the existing booking so it doesn't block itself)
