@@ -40,7 +40,7 @@ export default async function OwnerBookingsPage({
   const bookingWhere = {
     property: { ownerId: userId },
     ...(propertyId ? { propertyId } : {}),
-    ...(status ? { status } : {}),
+    ...(status ? { status: status as "pending" | "confirmed" | "completed" | "cancelled" } : {}),
     ...dateRangeFilter,
   };
 
