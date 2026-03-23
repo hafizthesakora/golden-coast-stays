@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import {
   Calendar, CheckCircle, Clock, DollarSign, Users,
@@ -28,7 +27,7 @@ export default async function OwnerBookingsPage({
     data: { status: "completed" },
   });
 
-  const dateRangeFilter: Prisma.BookingWhereInput =
+  const dateRangeFilter =
     checkInFrom || checkInTo
       ? {
           checkIn: {
@@ -38,10 +37,10 @@ export default async function OwnerBookingsPage({
         }
       : {};
 
-  const bookingWhere: Prisma.BookingWhereInput = {
+  const bookingWhere = {
     property: { ownerId: userId },
     ...(propertyId ? { propertyId } : {}),
-    ...(status ? { status: status as Prisma.EnumBookingStatusFilter } : {}),
+    ...(status ? { status } : {}),
     ...dateRangeFilter,
   };
 
