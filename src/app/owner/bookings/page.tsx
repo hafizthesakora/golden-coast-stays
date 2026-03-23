@@ -63,6 +63,7 @@ export default async function OwnerBookingsPage({
 
   // ── Stats ────────────────────────────────────────────────────────────────
   type OwnerBooking = typeof bookings[number];
+  type OwnerProperty = typeof properties[number];
   const totalRevenue = bookings
     .filter((b: OwnerBooking) => b.paymentStatus === "paid")
     .reduce((s: number, b: OwnerBooking) => s + Number(b.totalAmount), 0);
@@ -173,7 +174,7 @@ export default async function OwnerBookingsPage({
               >
                 All Properties
               </Link>
-              {properties.map((p) => (
+              {properties.map((p: OwnerProperty) => (
                 <Link
                   key={p.id}
                   href={buildHref({ propertyId: p.id })}
@@ -287,7 +288,7 @@ export default async function OwnerBookingsPage({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#f8f9fa]">
-                  {bookings.map((booking) => (
+                  {bookings.map((booking: OwnerBooking) => (
                     <tr key={booking.id} className="hover:bg-[#fafafa] transition-colors">
                       {/* Guest */}
                       <td className="px-5 py-4">
