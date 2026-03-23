@@ -450,20 +450,44 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
 }
 @media (max-width: 768px) {
   .gcs-section { padding: 60px 0; }
-  .booking-form { flex-direction: column; }
-  .booking-field { min-width: 100%; }
-  .booking-widget { padding: 25px 20px; }
   .testimonials-grid { grid-template-columns: 1fr; }
   .amenities-grid { grid-template-columns: repeat(2, 1fr); }
   .market-grid { grid-template-columns: repeat(2, 1fr); }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
   .tour-features { grid-template-columns: 1fr; }
   .page-hero { min-height: 360px; }
-  .hero-section { min-height: 100dvh; }
-  .hero-desc { font-size: 15px; }
   .section-header { margin-bottom: 40px; }
-  .btn-search { width: 100%; justify-content: center; }
   .cta-buttons { flex-direction: column; align-items: center; }
+
+  /* Hero: align from top so tall content doesn't land behind navbar */
+  .hero-section { align-items: flex-start; min-height: 100dvh; height: auto; }
+  .hero-content-wrap { padding-top: 90px; padding-bottom: 32px; }
+  .hero-subtitle { font-size: 11px; letter-spacing: 3px; margin-bottom: 12px; }
+  .hero-title { margin-bottom: 16px; }
+  .hero-desc { font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+
+  /* Booking widget: 2-column grid to keep form compact */
+  .booking-widget { padding: 16px; border-radius: 16px; }
+  .booking-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: end;
+  }
+  .booking-field { min-width: unset; }
+  .booking-field label { font-size: 10px; margin-bottom: 5px; }
+  .booking-field input, .booking-field select {
+    padding: 10px 12px;
+    font-size: 16px; /* Prevent iOS auto-zoom on focus */
+    border-radius: 8px;
+  }
+  .btn-search {
+    grid-column: span 2;
+    width: 100%;
+    justify-content: center;
+    padding: 13px 20px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 480px) {

@@ -99,7 +99,7 @@ export default function Navbar() {
       )}
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-16 sm:h-20 lg:h-28">
+        <div className="flex items-center justify-between h-20 lg:h-28">
 
           {/* Logo */}
           <Link href={isLoggedIn && role === "admin" ? "/admin" : isLoggedIn && role === "owner" ? "/owner" : "/"} className="flex items-center flex-shrink-0">
