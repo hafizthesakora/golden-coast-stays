@@ -21,8 +21,9 @@ export async function GET() {
     const providers = ["bizify", "paystack", "manual"];
     const result: Record<string, unknown> = {};
 
+    type PaymentConfig = typeof configs[number];
     for (const provider of providers) {
-      const existing = configs.find((c) => c.provider === provider);
+      const existing = configs.find((c: PaymentConfig) => c.provider === provider);
       if (existing) {
         result[provider] = existing;
       } else {
