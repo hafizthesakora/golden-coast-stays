@@ -22,7 +22,8 @@ export async function GET() {
       take: 50,
     });
 
-    const unreadCount = notifications.filter((n) => !n.isRead).length;
+    type Notification = typeof notifications[number];
+    const unreadCount = notifications.filter((n: Notification) => !n.isRead).length;
 
     return NextResponse.json({ notifications, unreadCount });
   } catch {

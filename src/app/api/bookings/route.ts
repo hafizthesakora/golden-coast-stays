@@ -83,9 +83,10 @@ export async function POST(req: NextRequest) {
     const ownerIdList: string[] = [];
     if (property.ownerId) ownerIdList.push(property.ownerId);
 
+    type AdminRow = typeof admins[number];
     const notifyUserIds = [
-      ...admins.map((a) => a.id),
-      ...ownerIdList.filter((id) => !admins.some((a) => a.id === id)),
+      ...admins.map((a: AdminRow) => a.id),
+      ...ownerIdList.filter((id: string) => !admins.some((a: AdminRow) => a.id === id)),
     ];
 
     if (notifyUserIds.length > 0) {
