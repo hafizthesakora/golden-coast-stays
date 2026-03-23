@@ -40,13 +40,17 @@ export default async function OwnerRevenuePage() {
   ]);
 
   // ── KPI calculations ──────────────────────────────────────────────────────
-  const totalEarned = allBookings.reduce((s, b) => s + Number(b.totalAmount), 0);
+  type AllBooking = typeof allBookings[number];
+  type Last6Booking = typeof last6MonthsData[number];
+  type StatusItem = { label: string; count: number; color: string };
+
+  const totalEarned = allBookings.reduce((s: number, b: AllBooking) => s + Number(b.totalAmount), 0);
 
   const now = new Date();
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const thisMonthRevenue = allBookings
-    .filter((b) => new Date(b.createdAt) >= thisMonthStart)
-    .reduce((s, b) => s + Number(b.totalAmount), 0);
+    .filter((b: AllBooking) => new Date(b.createdAt) >= thisMonthStart)
+    .reduce((s: number, b: AllBooking) => s + Number(b.totalAmount), 0);
 
   const avgPerBooking = allBookings.length > 0 ? totalEarned / allBookings.length : 0;
   const paidBookingsCount = allBookings.length;
@@ -59,24 +63,24 @@ export default async function OwnerRevenuePage() {
       ? new Date(now.getFullYear(), now.getMonth() + 1, 1)
       : monthStart(i - 1);
     const slice = last6MonthsData.filter(
-      (b) => new Date(b.createdAt) >= start && new Date(b.createdAt) < end
+      (b: Last6Booking) => new Date(b.createdAt) >= start && new Date(b.createdAt) < end
     );
     monthly.push({
       month: MONTH_LABELS[start.getMonth()],
       revenue: slice
-        .filter((b) => b.paymentStatus === "paid")
-        .reduce((s, b) => s + Number(b.totalAmount), 0),
+        .filter((b: Last6Booking) => b.paymentStatus === "paid")
+        .reduce((s: number, b: Last6Booking) => s + Number(b.totalAmount), 0),
       bookings: slice.length,
     });
   }
 
   // ── Booking status donut ──────────────────────────────────────────────────
   const statusBreakdown = [
-    { label: "Confirmed", count: last6MonthsData.filter((b) => b.status === "confirmed").length, color: "#10b981" },
-    { label: "Pending",   count: last6MonthsData.filter((b) => b.status === "pending").length,   color: "#f59e0b" },
-    { label: "Completed", count: last6MonthsData.filter((b) => b.status === "completed").length, color: "#3b82f6" },
-    { label: "Cancelled", count: last6MonthsData.filter((b) => b.status === "cancelled").length, color: "#ef4444" },
-  ].filter((s) => s.count > 0);
+    { label: "Confirmed", count: last6MonthsData.filter((b: Last6Booking) => b.status === "confirmed").length, color: "#10b981" },
+    { label: "Pending",   count: last6MonthsData.filter((b: Last6Booking) => b.status === "pending").length,   color: "#f59e0b" },
+    { label: "Completed", count: last6MonthsData.filter((b: Last6Booking) => b.status === "completed").length, color: "#3b82f6" },
+    { label: "Cancelled", count: last6MonthsData.filter((b: Last6Booking) => b.status === "cancelled").length, color: "#ef4444" },
+  ].filter((s: StatusItem) => s.count > 0);
 
   // ── Property revenue breakdown ────────────────────────────────────────────
   type RevProperty = typeof properties[number];
@@ -99,8 +103,8 @@ export default async function OwnerRevenuePage() {
 
   // ── Recent paid transactions ───────────────────────────────────────────────
   const recentTransactions = serialize(
-    allBookings.slice(0, 20).map((b: typeof allBookings[number]) => {
-      const prop = properties.find((p) => p.id === b.propertyId);
+    allBookings.slice(0, 20).map((b: AllBooking) => {
+      const prop = properties.find((p: RevProperty) => p.id === b.propertyId);
       return { ...b, propertyTitle: prop?.title ?? "Unknown Property" };
     })
   );

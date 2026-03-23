@@ -53,25 +53,31 @@ export default async function OwnerDashboard() {
   ]);
 
   // ── KPI calculations ──────────────────────────────────────────────────────
+  type OwnerPageProperty = typeof properties[number];
+  type OwnerPageBooking = OwnerPageProperty["bookings"][number];
+  type AllOwnerBooking = typeof allBookings[number];
+  type Last6Booking = typeof last6MonthsBookings[number];
+  type StatusItem = { label: string; count: number; color: string };
+
   const totalRevenue = allBookings
-    .filter((b) => b.paymentStatus === "paid")
-    .reduce((s, b) => s + Number(b.totalAmount), 0);
+    .filter((b: AllOwnerBooking) => b.paymentStatus === "paid")
+    .reduce((s: number, b: AllOwnerBooking) => s + Number(b.totalAmount), 0);
 
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const thisMonthRevenue = allBookings
-    .filter((b) => b.paymentStatus === "paid" && new Date(b.createdAt) >= thisMonthStart)
-    .reduce((s, b) => s + Number(b.totalAmount), 0);
+    .filter((b: AllOwnerBooking) => b.paymentStatus === "paid" && new Date(b.createdAt) >= thisMonthStart)
+    .reduce((s: number, b: AllOwnerBooking) => s + Number(b.totalAmount), 0);
 
-  const activeProperties = properties.filter((p) => p.status === "available").length;
-  const confirmedBookings = allBookings.filter((b) => b.status === "confirmed").length;
+  const activeProperties = properties.filter((p: OwnerPageProperty) => p.status === "available").length;
+  const confirmedBookings = allBookings.filter((b: AllOwnerBooking) => b.status === "confirmed").length;
   const upcomingBookings = allBookings.filter(
-    (b) => new Date(b.checkIn) >= now && b.status !== "cancelled"
+    (b: AllOwnerBooking) => new Date(b.checkIn) >= now && b.status !== "cancelled"
   ).length;
   const avgBookingValue =
     allBookings.length > 0
-      ? allBookings.reduce((s, b) => s + Number(b.totalAmount), 0) / allBookings.length
+      ? allBookings.reduce((s: number, b: AllOwnerBooking) => s + Number(b.totalAmount), 0) / allBookings.length
       : 0;
-  const totalReviews = properties.reduce((s, p) => s + p.reviews.length, 0);
+  const totalReviews = properties.reduce((s: number, p: OwnerPageProperty) => s + p.reviews.length, 0);
 
   // ── Monthly chart data ────────────────────────────────────────────────────
   const monthly: { month: string; revenue: number; bookings: number }[] = [];
@@ -81,29 +87,26 @@ export default async function OwnerDashboard() {
       ? new Date(now.getFullYear(), now.getMonth() + 1, 1)
       : monthStart(i - 1);
     const slice = last6MonthsBookings.filter(
-      (b) => new Date(b.createdAt) >= start && new Date(b.createdAt) < end
+      (b: Last6Booking) => new Date(b.createdAt) >= start && new Date(b.createdAt) < end
     );
     monthly.push({
       month: MONTH_LABELS[start.getMonth()],
       revenue: slice
-        .filter((b) => b.paymentStatus === "paid")
-        .reduce((s, b) => s + Number(b.totalAmount), 0),
+        .filter((b: Last6Booking) => b.paymentStatus === "paid")
+        .reduce((s: number, b: Last6Booking) => s + Number(b.totalAmount), 0),
       bookings: slice.length,
     });
   }
 
   // ── Booking status breakdown ───────────────────────────────────────────────
   const statusBreakdown = [
-    { label: "Confirmed", count: allBookings.filter((b) => b.status === "confirmed").length, color: "#10b981" },
-    { label: "Pending",   count: allBookings.filter((b) => b.status === "pending").length,   color: "#f59e0b" },
-    { label: "Completed", count: allBookings.filter((b) => b.status === "completed").length, color: "#3b82f6" },
-    { label: "Cancelled", count: allBookings.filter((b) => b.status === "cancelled").length, color: "#ef4444" },
-  ].filter((s) => s.count > 0);
+    { label: "Confirmed", count: allBookings.filter((b: AllOwnerBooking) => b.status === "confirmed").length, color: "#10b981" },
+    { label: "Pending",   count: allBookings.filter((b: AllOwnerBooking) => b.status === "pending").length,   color: "#f59e0b" },
+    { label: "Completed", count: allBookings.filter((b: AllOwnerBooking) => b.status === "completed").length, color: "#3b82f6" },
+    { label: "Cancelled", count: allBookings.filter((b: AllOwnerBooking) => b.status === "cancelled").length, color: "#ef4444" },
+  ].filter((s: StatusItem) => s.count > 0);
 
   // ── Top properties by revenue ─────────────────────────────────────────────
-  type OwnerPageProperty = typeof properties[number];
-  type OwnerPageBooking = OwnerPageProperty["bookings"][number];
-
   const propertyRevenue = properties.map((p: OwnerPageProperty) => ({
     title: p.title,
     bookings: p.bookings.length,
