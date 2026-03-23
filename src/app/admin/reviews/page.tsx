@@ -15,13 +15,14 @@ export default async function AdminReviewsPage() {
     },
   });
 
+  type Review = typeof reviews[number];
   const counts = {
     total: reviews.length,
-    approved: reviews.filter(r => r.isApproved).length,
-    pending: reviews.filter(r => !r.isApproved).length,
+    approved: reviews.filter((r: Review) => r.isApproved).length,
+    pending: reviews.filter((r: Review) => !r.isApproved).length,
     avgRating:
       reviews.length
-        ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
+        ? (reviews.reduce((s: number, r: Review) => s + r.rating, 0) / reviews.length).toFixed(1)
         : "—",
   };
 
