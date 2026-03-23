@@ -86,6 +86,8 @@ export default async function OwnerRevenuePage() {
   type RevProperty = typeof properties[number];
   type RevBooking = RevProperty["bookings"][number];
 
+  type PropBreakdown = { id: string; title: string; bookingCount: number; paidCount: number; revenue: number; pct: number };
+
   const propertyBreakdown = properties
     .map((p: RevProperty) => {
       const paidBookings = p.bookings.filter((b: RevBooking) => b.paymentStatus === "paid");
@@ -99,7 +101,7 @@ export default async function OwnerRevenuePage() {
         pct: totalEarned > 0 ? (revenue / totalEarned) * 100 : 0,
       };
     })
-    .sort((a, b) => b.revenue - a.revenue);
+    .sort((a: PropBreakdown, b: PropBreakdown) => b.revenue - a.revenue);
 
   // ── Recent paid transactions ───────────────────────────────────────────────
   const recentTransactions = serialize(
