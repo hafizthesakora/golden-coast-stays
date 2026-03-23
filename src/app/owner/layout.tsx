@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import OwnerSidebar from "@/components/owner/Sidebar";
+import OwnerShell from "@/components/owner/OwnerShell";
 
 export default async function OwnerLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -11,11 +11,8 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8f9fa]">
-      <OwnerSidebar />
-      <div className="flex-1 overflow-y-auto">
-        {children}
-      </div>
-    </div>
+    <OwnerShell>
+      {children}
+    </OwnerShell>
   );
 }

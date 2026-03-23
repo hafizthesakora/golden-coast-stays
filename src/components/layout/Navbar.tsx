@@ -98,8 +98,8 @@ export default function Navbar() {
         </div>
       )}
 
-      <div className="max-w-[1400px] mx-auto px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20 lg:h-28">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="flex items-center justify-between h-16 sm:h-20 lg:h-28">
 
           {/* Logo */}
           <Link href={isLoggedIn && role === "admin" ? "/admin" : isLoggedIn && role === "owner" ? "/owner" : "/"} className="flex items-center flex-shrink-0">
@@ -342,7 +342,7 @@ export default function Navbar() {
         "xl:hidden overflow-hidden transition-all duration-300 bg-white border-t border-[#e9ecef]",
         mobileOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
       )}>
-        <div className="max-w-[1400px] mx-auto px-8 py-4 space-y-1">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 py-4 space-y-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}

@@ -114,7 +114,7 @@ function NotificationBell({ collapsed }: { collapsed: boolean }) {
       <button
         ref={btnRef}
         onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-colors relative`}
+        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-colors relative"
         title={collapsed ? "Notifications" : undefined}
       >
         <div className="relative flex-shrink-0">
@@ -136,8 +136,8 @@ function NotificationBell({ collapsed }: { collapsed: boolean }) {
       {open && (
         <div
           ref={panelRef}
-          className="absolute bottom-full left-2 right-2 mb-2 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50"
-          style={{ width: "320px", left: collapsed ? "60px" : "4px", bottom: "100%" }}
+          className="absolute bottom-full mb-2 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50"
+          style={{ width: "300px", left: collapsed ? "60px" : "4px" }}
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
             <p className="text-sm font-semibold text-white">Notifications</p>
@@ -182,65 +182,100 @@ function NotificationBell({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+  mobileOpen: boolean;
+  setMobileOpen: (open: boolean) => void;
+}
+
+export default function AdminSidebar({ mobileOpen, setMobileOpen }: AdminSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+
+  // Close on route change
+  useEffect(() => { setMobileOpen(false); }, [pathname, setMobileOpen]);
 
   const isActive = (item: typeof navItems[0]) =>
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
   return (
-    <aside className={`h-screen flex flex-col bg-[#0a0a0a] border-r border-white/10 transition-all duration-300 flex-shrink-0 ${collapsed ? "w-16" : "w-60"}`}>
-      {/* Logo */}
-      <div className="flex items-center justify-between px-4 py-5 border-b border-white/10">
-        {!collapsed && (
-          <div>
-            <p className="text-[#c9a961] font-['Playfair_Display'] font-bold text-lg leading-none">Golden Coast Stays</p>
-            <p className="text-white/40 text-xs mt-0.5">Admin Panel</p>
-          </div>
-        )}
-        <button
-          onClick={() => setCollapsed(c => !c)}
-          className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
-        >
-          {collapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </button>
-      </div>
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
-      {/* Nav */}
-      <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
-        {navItems.map(item => {
-          const active = isActive(item);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${
-                active ? "bg-[#c9a961] text-white" : "text-white/60 hover:bg-white/5 hover:text-white"
-              }`}
-              title={collapsed ? item.label : undefined}
-            >
-              <item.icon className="h-4 w-4 flex-shrink-0" />
-              {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Bottom: Notifications + Sign out */}
-      <div className="border-t border-white/10 pt-2 pb-2">
-        <NotificationBell collapsed={collapsed} />
-        <div className="px-2">
+      <aside
+        className={[
+          "fixed md:static inset-y-0 left-0 z-50 md:z-auto",
+          "h-screen flex flex-col bg-[#0a0a0a] border-r border-white/10",
+          "transition-all duration-300 flex-shrink-0",
+          // Mobile: always w-64; Desktop: controlled by collapsed state
+          `w-64 ${collapsed ? "md:w-16" : "md:w-60"}`,
+          // Mobile: slide in/out; Desktop: always visible
+          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        ].join(" ")}
+      >
+        {/* Logo */}
+        <div className="flex items-center justify-between px-4 py-5 border-b border-white/10">
+          {!collapsed && (
+            <div>
+              <p className="text-[#c9a961] font-['Playfair_Display'] font-bold text-lg leading-none">Golden Coast Stays</p>
+              <p className="text-white/40 text-xs mt-0.5">Admin Panel</p>
+            </div>
+          )}
           <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
-            title={collapsed ? "Sign Out" : undefined}
+            onClick={() => setCollapsed(c => !c)}
+            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors hidden md:flex"
           >
-            <LogOut className="h-4 w-4 flex-shrink-0" />
-            {!collapsed && <span className="text-sm">Sign Out</span>}
+            {collapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </button>
+          {/* Mobile close button */}
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="md:hidden w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+          >
+            <X className="h-4 w-4" />
           </button>
         </div>
-      </div>
-    </aside>
+
+        {/* Nav */}
+        <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
+          {navItems.map(item => {
+            const active = isActive(item);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${
+                  active ? "bg-[#c9a961] text-white" : "text-white/60 hover:bg-white/5 hover:text-white"
+                }`}
+                title={collapsed ? item.label : undefined}
+              >
+                <item.icon className="h-4 w-4 flex-shrink-0" />
+                {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Bottom: Notifications + Sign out */}
+        <div className="border-t border-white/10 pt-2 pb-2">
+          <NotificationBell collapsed={collapsed} />
+          <div className="px-2">
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+              title={collapsed ? "Sign Out" : undefined}
+            >
+              <LogOut className="h-4 w-4 flex-shrink-0" />
+              {!collapsed && <span className="text-sm">Sign Out</span>}
+            </button>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }
