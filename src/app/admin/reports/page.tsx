@@ -111,6 +111,8 @@ export default async function AdminReportsPage() {
   type RawOwner = typeof ownersRaw[number];
   type RawOwnerProperty = RawOwner["ownedProperties"][number];
   type RawOwnerBooking = RawOwnerProperty["bookings"][number];
+  type MappedProperty = { title: string; city: string; bookings: number; revenue: number; occupancyRate: number };
+  type MappedOwner = { name: string; email: string; ownerId: string; properties: number; bookings: number; grossRevenue: number; netRevenue: number; refunded: number };
 
   const topProperties = propertiesRaw
     .map((p: RawProperty) => {
@@ -124,7 +126,7 @@ export default async function AdminReportsPage() {
       const occupancyRate = Math.min(100, Math.round((nightsBooked / 365) * 100));
       return { title: p.title, city: p.city, bookings: p.bookings.length, revenue, occupancyRate };
     })
-    .sort((a, b) => b.revenue - a.revenue)
+    .sort((a: MappedProperty, b: MappedProperty) => b.revenue - a.revenue)
     .slice(0, 10);
 
   // ── Owner performance ─────────────────────────────────────────────────────
@@ -142,7 +144,7 @@ export default async function AdminReportsPage() {
       netRevenue: gross - refunded,
       refunded,
     };
-  }).sort((a, b) => b.netRevenue - a.netRevenue);
+  }).sort((a: MappedOwner, b: MappedOwner) => b.netRevenue - a.netRevenue);
 
   // ── Top guests ────────────────────────────────────────────────────────────
   const guestBookings = await prisma.booking.findMany({
