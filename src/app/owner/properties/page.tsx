@@ -26,6 +26,7 @@ export default async function OwnerPropertiesPage() {
   // ── Aggregate stats ──────────────────────────────────────────────────────
   type PropItem = typeof properties[number];
   type PropBooking = PropItem["bookings"][number];
+  type PropReview = PropItem["reviews"][number];
   const totalProperties = properties.length;
   const activeProperties = properties.filter((p: PropItem) => p.status === "available").length;
   const totalBookings = properties.reduce((s: number, p: PropItem) => s + p.bookings.length, 0);
@@ -117,7 +118,7 @@ export default async function OwnerPropertiesPage() {
               const propertyRevenue = paidBookings.reduce((s: number, b: PropBooking) => s + Number(b.totalAmount), 0);
               const avgRating =
                 property.reviews.length > 0
-                  ? property.reviews.reduce((s, r) => s + r.rating, 0) / property.reviews.length
+                  ? property.reviews.reduce((s: number, r: PropReview) => s + r.rating, 0) / property.reviews.length
                   : null;
               const badge = statusBadge(property.status);
 
