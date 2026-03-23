@@ -249,7 +249,7 @@ export default async function OwnerRevenuePage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#f8f9fa]">
-                  {propertyBreakdown.map((p) => (
+                  {propertyBreakdown.map((p: PropBreakdown) => (
                     <tr key={p.id} className="hover:bg-[#fafafa] transition-colors">
                       <td className="px-6 py-4 font-medium text-[#1a1a1a]">{p.title}</td>
                       <td className="px-6 py-4 text-[#343a40]">{p.bookingCount}</td>
