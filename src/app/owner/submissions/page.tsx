@@ -25,6 +25,8 @@ export default async function SubmissionsPage({
     prisma.property.count({ where: { ownerId: userId } }),
   ]);
 
+  type Submission = typeof submissions[number];
+
   const statusConfig: Record<string, { pill: string; icon: React.ReactNode; label: string }> = {
     pending: {
       pill: "bg-yellow-100 text-yellow-800 border border-yellow-200",
@@ -129,7 +131,7 @@ export default async function SubmissionsPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {submissions.map((sub) => {
+            {submissions.map((sub: Submission) => {
               const cfg = statusConfig[sub.status] ?? {
                 pill: "bg-gray-100 text-gray-700 border border-gray-200",
                 icon: <Clock className="h-3.5 w-3.5" />,
@@ -198,7 +200,7 @@ export default async function SubmissionsPage({
 
                     {sub.amenities?.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mb-4">
-                        {sub.amenities.slice(0, 4).map((a) => (
+                        {sub.amenities.slice(0, 4).map((a: string) => (
                           <span
                             key={a}
                             className="text-xs px-2 py-0.5 bg-[#f8f9fa] border border-[#e9ecef] rounded-full text-[#343a40]"
