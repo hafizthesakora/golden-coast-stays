@@ -270,6 +270,12 @@ export default function PropertyDetailsClient({
             {/* Main image */}
             <div className="col-span-2 row-span-2 relative cursor-pointer group" onClick={() => setLightboxIdx(0)}>
               <Image src={images[0]?.imageUrl || "/images/h1.jpg"} alt={property.title} fill className="object-cover group-hover:brightness-90 transition-all" priority />
+              {images.length > 1 && (
+                <div className="sm:hidden absolute bottom-3 right-3 bg-black/60 text-white text-xs font-medium px-2.5 py-1 rounded-lg flex items-center gap-1">
+                  <ChevronLeft className="h-3 w-3" /><ChevronRight className="h-3 w-3" />
+                  Tap to view all {images.length} photos
+                </div>
+              )}
             </div>
             {/* Side images */}
             {[1, 2, 3, 4].map((i) => (

@@ -90,9 +90,9 @@ export default function VirtualTourSection() {
               src="https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=800"
               alt="Virtual Tour Preview"
             />
-            <button className="tour-play-btn" style={{ fontSize: "36px", color: "white" }}>
+            <Link href="/virtual-tours" className="tour-play-btn" style={{ fontSize: "36px", color: "white", textDecoration: "none" }}>
               ▶
-            </button>
+            </Link>
             <div className="tour-360-badge">
               <span style={{ color: "var(--gold-primary)" }}>↻</span>
               <span>Virtual Tour</span>

@@ -124,9 +124,9 @@ export default function ServiceApartmentsPage() {
   return (
     <>
       {/* ── HERO ── split-screen with slanted image panel */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: "100vh" }}>
+      <div className="sa-hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: "100vh" }}>
         {/* Left — text */}
-        <div style={{
+        <div className="sa-hero-text" style={{
           display: "flex", flexDirection: "column", justifyContent: "center",
           padding: "120px 60px 80px", background: "white", position: "relative", zIndex: 1,
         }}>
@@ -158,7 +158,7 @@ export default function ServiceApartmentsPage() {
         </div>
 
         {/* Right — image carousel with slant */}
-        <div style={{
+        <div className="sa-hero-img" style={{
           position: "relative", overflow: "hidden",
           clipPath: "polygon(8% 0%, 100% 0%, 100% 100%, 0% 100%)",
         }}>
@@ -316,8 +316,8 @@ export default function ServiceApartmentsPage() {
               </button>
             ))}
           </div>
-          <div style={{ background: "white", borderRadius: "var(--radius-lg)", padding: "40px 48px", boxShadow: "var(--shadow-sm)" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div className="sa-exp-content" style={{ background: "white", borderRadius: "var(--radius-lg)", padding: "40px 48px", boxShadow: "var(--shadow-sm)" }}>
+            <div className="sa-exp-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
               {experiences[expSlide].items.map((item, i) => (
                 <div key={i} style={{
                   display: "flex", alignItems: "center", gap: "12px",
@@ -447,10 +447,12 @@ export default function ServiceApartmentsPage() {
           0% { transform: translateY(-100%); }
           100% { transform: translateY(200%); }
         }
-        @media (max-width: 1024px) {
-          .sa-hero-grid { grid-template-columns: 1fr !important; }
-        }
         @media (max-width: 768px) {
+          .sa-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
+          .sa-hero-text { padding: 100px 24px 40px !important; justify-content: flex-start !important; }
+          .sa-hero-img { clip-path: none !important; height: 280px !important; }
+          .sa-exp-content { padding: 24px 16px !important; }
+          .sa-exp-grid { grid-template-columns: 1fr !important; }
           [style*="repeat(3, 1fr)"] { grid-template-columns: 1fr 1fr !important; }
           [style*="repeat(4, 1fr)"] { grid-template-columns: 1fr 1fr !important; }
         }

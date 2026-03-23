@@ -64,8 +64,8 @@ export default function FeaturedProperties({ properties }: { properties: Propert
         </div>
         </AnimateIn>
 
-        <div style={{ position: "relative" }}>
-          {/* Prev button */}
+        <div style={{ position: "relative", overflow: "hidden" }}>
+          {/* Prev button — hidden on mobile via CSS */}
           <button
             className="carousel-btn"
             onClick={() => scroll("left")}
@@ -192,7 +192,7 @@ export default function FeaturedProperties({ properties }: { properties: Propert
             })}
           </div>
 
-          {/* Next button */}
+          {/* Next button — hidden on mobile via CSS */}
           <button
             className="carousel-btn"
             onClick={() => scroll("right")}
@@ -204,6 +204,16 @@ export default function FeaturedProperties({ properties }: { properties: Propert
           >
             <ChevronRight style={{ width: "20px", height: "20px" }} />
           </button>
+        </div>
+
+        {/* Swipe hint — visible on mobile only */}
+        <div className="carousel-swipe-hint" style={{
+          alignItems: "center", justifyContent: "center", gap: "6px",
+          marginTop: "12px", color: "var(--medium-gray)", fontSize: "12px",
+        }}>
+          <ChevronLeft style={{ width: "14px", height: "14px" }} />
+          <span>Swipe to see more properties</span>
+          <ChevronRight style={{ width: "14px", height: "14px" }} />
         </div>
 
         <div style={{ textAlign: "center", marginTop: "40px" }}>

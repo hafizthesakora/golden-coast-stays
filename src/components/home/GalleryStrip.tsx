@@ -19,6 +19,7 @@ export default function GalleryStrip() {
   const gridRef = useRef<HTMLDivElement>(null);
   const [headerVis, setHeaderVis] = useState(false);
   const [gridVis, setGridVis] = useState(false);
+  const [touchedIdx, setTouchedIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const makeObs = (setter: (v: boolean) => void) =>
@@ -58,7 +59,11 @@ export default function GalleryStrip() {
           }}
         >
           {images.map((img, i) => (
-            <div key={i} className="gallery-item">
+            <div
+              key={i}
+              className={`gallery-item${touchedIdx === i ? " gallery-item--touched" : ""}`}
+              onClick={() => setTouchedIdx(touchedIdx === i ? null : i)}
+            >
               <Image src={img.src} alt={img.alt} fill style={{ objectFit: "cover" }} />
               <div className="gallery-overlay">
                 <h4>{t(img.captionKey)}</h4>

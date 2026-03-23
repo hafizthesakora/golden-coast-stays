@@ -466,11 +466,11 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
   .hero-title { margin-bottom: 16px; }
   .hero-desc { font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
 
-  /* Booking widget: 2-column grid to keep form compact */
+  /* Booking widget: 1-column grid on mobile */
   .booking-widget { padding: 16px; border-radius: 16px; }
   .booking-form {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 12px;
     align-items: end;
   }
@@ -482,12 +482,27 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
     border-radius: 8px;
   }
   .btn-search {
-    grid-column: span 2;
     width: 100%;
     justify-content: center;
     padding: 13px 20px;
     font-size: 13px;
   }
+
+  /* Testimonials: fix quote mark overlapping stars */
+  .testimonial-card { padding: 28px 22px; }
+  .testimonial-card::before { font-size: 80px; top: 28px; z-index: 0; }
+  .testimonial-rating { position: relative; z-index: 1; }
+
+  /* Featured carousel: hide overflow nav buttons, fix card width */
+  .carousel-btn { display: none !important; }
+  .prop-card { flex: 0 0 82% !important; min-width: unset !important; }
+
+  /* Gallery: show overlay on tap */
+  .gallery-item--touched .gallery-overlay { opacity: 1; }
+  .gallery-item--touched .gallery-zoom { transform: translate(-50%, -50%) scale(1); }
+
+  /* Carousel swipe hint */
+  .carousel-swipe-hint { display: flex; }
 }
 
 @media (max-width: 480px) {
@@ -498,8 +513,12 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
   .gallery-item:first-child { grid-column: span 1; height: 260px; }
   .market-grid { grid-template-columns: 1fr; }
   .amenities-grid { grid-template-columns: repeat(2, 1fr); }
-  .testimonial-card { padding: 28px 22px; }
+  .testimonial-card { padding: 24px 18px; }
   .booking-widget { border-radius: 16px; }
   .hero-subtitle { font-size: 12px; letter-spacing: 3px; }
   .virtual-tour-preview img { height: 260px; }
+  .prop-card { flex: 0 0 88% !important; }
 }
+
+/* Carousel swipe hint: hidden on desktop, shown via mobile override above */
+.carousel-swipe-hint { display: none; }
