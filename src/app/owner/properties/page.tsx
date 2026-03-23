@@ -111,10 +111,10 @@ export default async function OwnerPropertiesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {properties.map((property) => {
+            {properties.map((property: PropItem) => {
               const thumbnail = property.images[0]?.imageUrl;
-              const paidBookings = property.bookings.filter((b) => b.paymentStatus === "paid");
-              const propertyRevenue = paidBookings.reduce((s, b) => s + Number(b.totalAmount), 0);
+              const paidBookings = property.bookings.filter((b: PropBooking) => b.paymentStatus === "paid");
+              const propertyRevenue = paidBookings.reduce((s: number, b: PropBooking) => s + Number(b.totalAmount), 0);
               const avgRating =
                 property.reviews.length > 0
                   ? property.reviews.reduce((s, r) => s + r.rating, 0) / property.reviews.length
