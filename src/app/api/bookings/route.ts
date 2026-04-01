@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateBookingRef, formatCurrency, formatDate } from "@/lib/utils";
+import { getLodgifyBlockedDates, isDateRangeBlocked } from "@/lib/lodgify";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,14 +23,25 @@ export async function POST(req: NextRequest) {
     // Fetch property with owner info
     const property = await prisma.property.findUnique({
       where: { id: propertyId },
-      select: { title: true, city: true, ownerId: true },
+      select: { title: true, city: true, ownerId: true, lodgifyRoomTypeId: true },
     });
 
     if (!property) {
       return NextResponse.json({ success: false, error: "Property not found" }, { status: 404 });
     }
 
-    // Check availability
+    // Check Lodgify availability if configured
+    if (property.lodgifyRoomTypeId) {
+      const blocked = await getLodgifyBlockedDates(property.lodgifyRoomTypeId, checkIn, checkOut);
+      if (isDateRangeBlocked(checkIn, checkOut, blocked)) {
+        return NextResponse.json(
+          { success: false, error: "Property is not available for selected dates" },
+          { status: 409 }
+        );
+      }
+    }
+
+    // Check local DB availability
     const conflicting = await prisma.booking.count({
       where: {
         propertyId,

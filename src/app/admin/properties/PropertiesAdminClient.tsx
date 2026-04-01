@@ -34,6 +34,8 @@ interface Property {
   status: string;
   featured: boolean;
   hasVirtualTour: boolean;
+  lodgifyPropertyId: string | null;
+  lodgifyRoomTypeId: string | null;
   images: { imageUrl: string }[];
   _count: { bookings: number; reviews: number };
   owner?: { id: string; name: string | null; email: string } | null;
@@ -53,6 +55,7 @@ const emptyForm = {
   bathrooms: "1", maxGuests: "2", area: "", areaUnit: "sqft",
   amenities: [] as string[], featured: false, hasVirtualTour: false,
   virtualTourUrl: "", status: "available", lat: "", lng: "",
+  lodgifyPropertyId: "", lodgifyRoomTypeId: "",
 };
 
 const PER_PAGE = 10;
@@ -389,6 +392,8 @@ export default function PropertiesAdminClient({
       bedrooms: String(p.bedrooms), bathrooms: String(p.bathrooms),
       maxGuests: String(p.maxGuests), status: p.status, featured: p.featured,
       hasVirtualTour: p.hasVirtualTour,
+      lodgifyPropertyId: p.lodgifyPropertyId || "",
+      lodgifyRoomTypeId: p.lodgifyRoomTypeId || "",
     });
     setEditingId(p.id); setSavedPropertyId(p.id);
     setStep("details"); setPanelOpen(true);
@@ -972,6 +977,32 @@ export default function PropertiesAdminClient({
                           className={inputClass}
                         />
                       )}
+                    </div>
+                  </div>
+
+                  {/* Lodgify Integration */}
+                  <div>
+                    <SectionHeader icon={Tag} label="Lodgify Integration" />
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-[#6c757d] mb-1">Lodgify Property ID</label>
+                        <input
+                          value={form.lodgifyPropertyId}
+                          onChange={e => setForm(f => ({ ...f, lodgifyPropertyId: e.target.value }))}
+                          placeholder="e.g. 123456"
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-[#6c757d] mb-1">Lodgify Room Type ID</label>
+                        <input
+                          value={form.lodgifyRoomTypeId}
+                          onChange={e => setForm(f => ({ ...f, lodgifyRoomTypeId: e.target.value }))}
+                          placeholder="e.g. 789012"
+                          className={inputClass}
+                        />
+                        <p className="text-xs text-[#adb5bd] mt-1">When set, availability is synced from Lodgify calendar.</p>
+                      </div>
                     </div>
                   </div>
                 </form>

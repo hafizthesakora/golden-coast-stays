@@ -43,7 +43,7 @@ interface Props {
   existingBooking?: ExistingBooking | null;
 }
 
-export default function BookingClient({ property, user, initialCheckIn, initialCheckOut, initialGuests, existingBooking }: Props) {
+export default function BookingClient({ property, user, initialCheckIn, initialCheckOut, initialGuests, bookedRanges, existingBooking }: Props) {
   const router = useRouter();
   const price = Number(property.pricePerNight);
   const isResume = !!existingBooking;
@@ -60,6 +60,15 @@ export default function BookingClient({ property, user, initialCheckIn, initialC
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const isBlocked = (ci: string, co: string) => {
+    if (!ci || !co) return false;
+    const inMs = new Date(ci).getTime();
+    const outMs = new Date(co).getTime();
+    return bookedRanges.some(
+      ({ start, end }) => new Date(start).getTime() < outMs && new Date(end).getTime() >= inMs
+    );
+  };
 
   const nights = checkIn && checkOut
     ? Math.max(0, Math.round((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000))
@@ -80,6 +89,7 @@ export default function BookingClient({ property, user, initialCheckIn, initialC
     }
 
     if (!checkIn || !checkOut || nights < 1) { setError("Please select valid check-in and check-out dates."); return; }
+    if (isBlocked(checkIn, checkOut)) { setError("Selected dates are not available. Please choose different dates."); return; }
     if (!guestName || !guestEmail) { setError("Please fill in your name and email."); return; }
     setLoading(true);
     try {
@@ -153,14 +163,21 @@ export default function BookingClient({ property, user, initialCheckIn, initialC
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-[#343a40] mb-1.5">CHECK-IN DATE *</label>
-                    <input type="date" value={checkIn} min={new Date().toISOString().split("T")[0]} onChange={e => setCheckIn(e.target.value)} required
-                      className="w-full h-12 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961] focus:ring-2 focus:ring-[#c9a961]/20" />
+                    <input type="date" value={checkIn} min={new Date().toISOString().split("T")[0]}
+                      onChange={e => { setCheckIn(e.target.value); setError(""); }} required
+                      className={`w-full h-12 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-[#c9a961]/20 ${isBlocked(checkIn, checkOut) ? "border-red-400" : "border-[#e9ecef] focus:border-[#c9a961]"}`} />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#343a40] mb-1.5">CHECK-OUT DATE *</label>
-                    <input type="date" value={checkOut} min={checkIn || new Date().toISOString().split("T")[0]} onChange={e => setCheckOut(e.target.value)} required
-                      className="w-full h-12 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961] focus:ring-2 focus:ring-[#c9a961]/20" />
+                    <input type="date" value={checkOut} min={checkIn || new Date().toISOString().split("T")[0]}
+                      onChange={e => { setCheckOut(e.target.value); setError(""); }} required
+                      className={`w-full h-12 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-[#c9a961]/20 ${isBlocked(checkIn, checkOut) ? "border-red-400" : "border-[#e9ecef] focus:border-[#c9a961]"}`} />
                   </div>
+                  {isBlocked(checkIn, checkOut) && checkIn && checkOut && (
+                    <p className="col-span-full text-xs text-red-600 font-medium -mt-1">
+                      These dates are not available. Please choose different dates.
+                    </p>
+                  )}
                   <div>
                     <label className="block text-xs font-semibold text-[#343a40] mb-1.5">GUESTS *</label>
                     <select value={guests} onChange={e => setGuests(parseInt(e.target.value))}

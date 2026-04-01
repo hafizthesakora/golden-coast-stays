@@ -21,6 +21,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         pricePerNight: body.pricePerNight, bedrooms: body.bedrooms, bathrooms: body.bathrooms,
         maxGuests: body.maxGuests, amenities: body.amenities, featured: body.featured,
         hasVirtualTour: body.hasVirtualTour, virtualTourUrl: body.virtualTourUrl, status: body.status,
+        lodgifyPropertyId: body.lodgifyPropertyId || null,
+        lodgifyRoomTypeId: body.lodgifyRoomTypeId || null,
       },
     });
     return NextResponse.json({ property });

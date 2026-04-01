@@ -131,9 +131,11 @@ model Property {
   amenities      String[]
   featured       Boolean        @default(false)
   status         PropertyStatus @default(available)
-  hasVirtualTour Boolean        @default(false)
-  virtualTourUrl String?
-  createdAt      DateTime       @default(now())
+  hasVirtualTour     Boolean        @default(false)
+  virtualTourUrl     String?
+  lodgifyPropertyId  String?
+  lodgifyRoomTypeId  String?
+  createdAt          DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
   ownerId   String?

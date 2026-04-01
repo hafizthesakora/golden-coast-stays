@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import BookingClient from "./BookingClient";
 import { serialize } from "@/lib/utils";
+import { getLodgifyBlockedDates } from "@/lib/lodgify";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Book Now | Golden Coast Stay" };
@@ -39,16 +40,29 @@ export default async function BookingPage({
       }).then((b: { id: string; reference: string; checkIn: Date; checkOut: Date; guests: number; guestName: string | null; guestEmail: string | null; guestPhone: string | null; specialRequests: string | null } | null) => (b && b.id ? b : null))
     : null;
 
-  // Get booked ranges (exclude the existing booking so it doesn't block itself)
-  const bookings = await prisma.booking.findMany({
-    where: {
-      propertyId,
-      status: { not: "cancelled" },
-      checkOut: { gte: new Date() },
-      ...(existingBooking ? { id: { not: existingBooking.id } } : {}),
-    },
-    select: { checkIn: true, checkOut: true },
-  });
+  // Get booked ranges — prefer Lodgify, fall back to local DB
+  const today = new Date().toISOString().split("T")[0];
+  const oneYearOut = new Date(Date.now() + 365 * 86400000).toISOString().split("T")[0];
+
+  let bookedRanges: { start: string; end: string }[] = [];
+
+  if (property.lodgifyRoomTypeId) {
+    bookedRanges = await getLodgifyBlockedDates(property.lodgifyRoomTypeId, today, oneYearOut);
+  } else {
+    const bookings = await prisma.booking.findMany({
+      where: {
+        propertyId,
+        status: { not: "cancelled" },
+        checkOut: { gte: new Date() },
+        ...(existingBooking ? { id: { not: existingBooking.id } } : {}),
+      },
+      select: { checkIn: true, checkOut: true },
+    });
+    bookedRanges = bookings.map((b: { checkIn: Date; checkOut: Date }) => ({
+      start: b.checkIn.toISOString().split("T")[0],
+      end: b.checkOut.toISOString().split("T")[0],
+    }));
+  }
 
   return (
     <BookingClient
@@ -57,10 +71,7 @@ export default async function BookingPage({
       initialCheckIn={sp.check_in || ""}
       initialCheckOut={sp.check_out || ""}
       initialGuests={parseInt(sp.guests || "1")}
-      bookedRanges={bookings.map((b: { checkIn: Date; checkOut: Date }) => ({
-        start: b.checkIn.toISOString().split("T")[0],
-        end: b.checkOut.toISOString().split("T")[0],
-      }))}
+      bookedRanges={bookedRanges}
       existingBooking={existingBooking ? serialize(existingBooking) : null}
     />
   );
