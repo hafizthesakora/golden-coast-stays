@@ -181,11 +181,14 @@ model Booking {
   status          BookingStatus @default(pending)
   paymentStatus   PaymentStatus @default(pending)
   paymentMethod   String?
-  paystackRef     String?
-  specialRequests String?       @db.Text
-  paidAt          DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  paystackRef       String?
+  specialRequests   String?       @db.Text
+  paidAt            DateTime?
+  bizifyReference   String?       // Bizify transaction reference (BIZ-XXXXX-XXXXXX)
+  lodgifyBookingId  String?       // Lodgify booking ID (for two-way sync)
+  lodgifySource     Boolean       @default(false) // true = booking originated from Lodgify
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
   property Property @relation(fields: [propertyId], references: [id])
   user     User?    @relation(fields: [userId], references: [id])

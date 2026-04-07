@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import {
   LayoutDashboard, Home, Calendar, Users, Image, MapPin, Settings,
   LogOut, ChevronLeft, Menu, FileText, Star, CreditCard,
-  Bell, Info, CheckCircle, AlertTriangle, XCircle, X, Building2, BarChart2,
+  Bell, Info, CheckCircle, AlertTriangle, XCircle, X, Building2, BarChart2, Link2,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ const navItems = [
   { href: "/admin/gallery", label: "Gallery", icon: Image },
   { href: "/admin/tours", label: "Virtual Tours", icon: MapPin },
   { href: "/admin/payments", label: "Payments", icon: CreditCard },
+  { href: "/admin/lodgify", label: "Lodgify Sync", icon: Link2 },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
