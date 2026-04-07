@@ -83,9 +83,7 @@ export default function LodgifyAdminClient() {
   async function runCronNow() {
     setRunningCron(true);
     try {
-      const res = await fetch("/api/cron/lodgify-sync", {
-        headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET ?? ""}` },
-      });
+      const res = await fetch("/api/cron/lodgify-sync");
       const data = await res.json();
       if (res.ok) {
         showToast(`Done — ${data.imported} new, ${data.updated} updated, ${data.skipped} unchanged`, true);

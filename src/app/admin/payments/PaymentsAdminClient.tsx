@@ -275,14 +275,25 @@ export default function PaymentsAdminClient({ initialConfigs }: Props) {
           </div>
         )}
 
-        {/* Bizify Info Banner */}
+        {/* Bizify Status Banner */}
         {activeTab === "bizify" && (
-          <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4">
-            <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+          <div className={`flex items-start gap-3 rounded-2xl px-5 py-4 ${
+            form.apiKey && form.secretKey
+              ? "bg-emerald-50 border border-emerald-200"
+              : "bg-amber-50 border border-amber-200"
+          }`}>
+            {form.apiKey && form.secretKey
+              ? <CheckCircle className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+              : <Info className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            }
             <div>
-              <p className="text-sm font-semibold text-blue-700">Bizify — Integration Coming Soon</p>
-              <p className="text-xs text-blue-600 mt-0.5">
-                Bizify is our in-house payment platform. API credentials will be provided upon onboarding. No action required at this time.
+              <p className={`text-sm font-semibold ${form.apiKey && form.secretKey ? "text-emerald-700" : "text-amber-700"}`}>
+                {form.apiKey && form.secretKey ? "Bizify — Connected & Live" : "Bizify — API Keys Required"}
+              </p>
+              <p className={`text-xs mt-0.5 ${form.apiKey && form.secretKey ? "text-emerald-600" : "text-amber-600"}`}>
+                {form.apiKey && form.secretKey
+                  ? "Payments are active. Guests are redirected to Bizify's secure checkout on booking."
+                  : "Enter your Bizify public key, secret key, and merchant ID to enable payments."}
               </p>
             </div>
           </div>

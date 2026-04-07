@@ -31,8 +31,26 @@ export default async function PaymentsAdminPage() {
   for (const provider of providers) {
     let config = await prisma.paymentConfig.findFirst({ where: { provider } });
     if (!config) {
+      // Seed from env vars on first load
+      const envApiKey = provider === "bizify" ? (process.env.NEXT_PUBLIC_BIZIFY_PUBLIC_KEY ?? null) : null;
+      const envSecretKey = provider === "bizify" ? (process.env.BIZIFY_SECRET_KEY ?? null) : null;
+      const envWebhookUrl = provider === "bizify"
+        ? `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/api/webhooks/bizify`
+        : null;
+      const envExtra = provider === "bizify"
+        ? JSON.stringify({ merchantId: process.env.BIZIFY_MERCHANT_ID ?? "" })
+        : null;
+
       config = await prisma.paymentConfig.create({
-        data: { provider, isLive: false, isActive: provider === "bizify" },
+        data: {
+          provider,
+          apiKey: envApiKey,
+          secretKey: envSecretKey,
+          webhookUrl: envWebhookUrl || null,
+          extra: envExtra,
+          isLive: true,
+          isActive: provider === "bizify",
+        },
       });
     }
     configs[provider] = config;

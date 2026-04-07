@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import { generateBookingRef } from "@/lib/utils";
 
-// Vercel calls this every 15 minutes via cron.
-// It can also be triggered manually from the admin panel with the CRON_SECRET header.
-// Security: requests must carry Authorization: Bearer <CRON_SECRET>
+// Vercel calls this daily via cron (vercel.json).
+// Can also be triggered manually from the admin panel — accepts either:
+//   1. Admin session cookie (from the browser)
+//   2. Authorization: Bearer <CRON_SECRET> (from external cron services like cron-job.org)
 
 interface LodgifyGuest {
   name?: string;
@@ -27,11 +29,18 @@ interface LodgifyReservation {
 }
 
 export async function GET(req: NextRequest) {
-  // Verify cron secret
+  // Accept admin session OR Bearer cron secret
   const secret = process.env.CRON_SECRET;
-  const auth = req.headers.get("authorization");
-  if (secret && auth !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const authHeader = req.headers.get("authorization");
+  const bearerOk = secret && authHeader === `Bearer ${secret}`;
+
+  if (!bearerOk) {
+    // Fall back to session-based auth (admin only)
+    const session = await auth();
+    const isAdmin = session && (session as { user?: { role?: string } }).user?.role === "admin";
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   }
 
   if (!process.env.LODGIFY_API_KEY) {
