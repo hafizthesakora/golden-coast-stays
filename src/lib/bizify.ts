@@ -38,11 +38,11 @@ export interface BizifyTransaction {
 export async function initializeBizifyPayment(
   payload: BizifyInitPayload
 ): Promise<{ reference: string; checkout_url: string } | null> {
-  const pk = publicKey();
+  const sk = secretKey();
   const mid = merchantId();
 
-  if (!pk) {
-    console.error("Bizify: NEXT_PUBLIC_BIZIFY_PUBLIC_KEY is not set");
+  if (!sk) {
+    console.error("Bizify: BIZIFY_SECRET_KEY is not set");
     return null;
   }
 
@@ -52,11 +52,13 @@ export async function initializeBizifyPayment(
     ...(mid ? { merchant_id: mid } : {}),
   };
 
+  console.log(`Bizify initialize: key prefix=${sk.slice(0, 12)}... mid=${mid ? mid.slice(0, 8) + "..." : "none"}`);
+
   try {
     const res = await fetch(`${BIZIFY_BASE}/payment/initialize`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${pk}`,
+        Authorization: `Bearer ${sk}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),

@@ -5,13 +5,13 @@ import { initializeBizifyPayment } from "@/lib/bizify";
 
 // Debug: surface Bizify raw response for easier troubleshooting
 async function probeBizify() {
-  const pk = process.env.NEXT_PUBLIC_BIZIFY_PUBLIC_KEY;
+  const sk = process.env.BIZIFY_SECRET_KEY;
   const mid = process.env.BIZIFY_MERCHANT_ID;
-  if (!pk) return { ok: false, error: "NEXT_PUBLIC_BIZIFY_PUBLIC_KEY not set" };
+  if (!sk) return { ok: false, error: "BIZIFY_SECRET_KEY not set" };
   try {
     const res = await fetch("https://mybizify.com/api/v1/payment/initialize", {
       method: "POST",
-      headers: { Authorization: `Bearer ${pk}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${sk}`, "Content-Type": "application/json" },
       body: JSON.stringify({ amount: 1, email: "test@test.com", currency: "GHS", ...(mid ? { merchant_id: mid } : {}) }),
     });
     const text = await res.text();
