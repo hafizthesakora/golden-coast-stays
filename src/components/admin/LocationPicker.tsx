@@ -1,5 +1,6 @@
 "use client";
 
+import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Search, MapPin, X, Loader2 } from "lucide-react";
 
@@ -58,7 +59,6 @@ export default function LocationPicker({ lat, lng, onSelect }: LocationPickerPro
 
     async function initMap() {
       const L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
 
       // Fix default marker icons broken in webpack
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
