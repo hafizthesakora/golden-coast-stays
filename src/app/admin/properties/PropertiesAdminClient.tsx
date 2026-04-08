@@ -45,11 +45,32 @@ interface Property {
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const AMENITIES_LIST = [
-  "WiFi", "Air Conditioning", "Swimming Pool", "Gym", "Parking",
-  "Kitchen", "Washer/Dryer", "Smart TV", "DSTV", "Security",
-  "Generator", "Balcony", "Garden", "BBQ Grill", "Dishwasher",
-  "Work Desk", "Coffee Maker", "Hot Tub", "Elevator", "Pet Friendly",
+const AMENITIES_GROUPS: { label: string; items: string[] }[] = [
+  {
+    label: "Essentials",
+    items: ["WiFi", "Air Conditioning", "Generator", "Security", "Parking", "Elevator"],
+  },
+  {
+    label: "Kitchen & Laundry",
+    items: ["Kitchen", "Washer/Dryer", "Dishwasher", "Coffee Maker", "Refrigerator", "Microwave"],
+  },
+  {
+    label: "Entertainment & Work",
+    items: ["Smart TV", "DSTV", "Work Desk", "Balcony", "Garden", "BBQ Grill"],
+  },
+  {
+    label: "Leisure",
+    items: ["Swimming Pool", "Gym", "Hot Tub", "Pet Friendly"],
+  },
+  {
+    label: "Ghanaian & Cultural",
+    items: [
+      "Fufu Ponding Machine", "Outdoor Cooking Area", "Charcoal Grill (Suya Spot)",
+      "Borehole / Well Water", "Water Sachet Cooler", "Traditional Courtyard",
+      "Kente Decor", "Local Art Collection", "Drum Set / Cultural Instruments",
+      "Prayer Room", "Mosquito Nets", "Veranda / Storey Building Porch",
+    ],
+  },
 ];
 
 const emptyForm = {
@@ -257,6 +278,36 @@ function ImagePanel({
 }
 
 // ─── Section Header ───────────────────────────────────────────────────────────
+function CustomAmenityInput({ onAdd }: { onAdd: (a: string) => void }) {
+  const [val, setVal] = useState("");
+  function submit() {
+    const trimmed = val.trim();
+    if (!trimmed) return;
+    onAdd(trimmed);
+    setVal("");
+  }
+  return (
+    <div className="flex gap-2">
+      <input
+        type="text"
+        value={val}
+        onChange={e => setVal(e.target.value)}
+        onKeyDown={e => e.key === "Enter" && (e.preventDefault(), submit())}
+        placeholder="e.g. Fufu Kitchen, Outdoor Shower…"
+        className="flex-1 h-9 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961] bg-white placeholder:text-[#adb5bd]"
+      />
+      <button
+        type="button"
+        onClick={submit}
+        disabled={!val.trim()}
+        className="flex items-center gap-1.5 px-4 h-9 rounded-xl bg-[#c9a961] text-white text-xs font-semibold hover:bg-[#9a7b3c] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+      >
+        <Plus className="h-3.5 w-3.5" /> Add
+      </button>
+    </div>
+  );
+}
+
 function SectionHeader({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
     <div className="flex items-center gap-2 pb-3 border-b border-[#f0f0f0] mb-4">
@@ -951,20 +1002,56 @@ export default function PropertiesAdminClient({
                   {/* Amenities */}
                   <div>
                     <SectionHeader icon={Wifi} label="Amenities" />
-                    <div className="flex flex-wrap gap-2">
-                      {AMENITIES_LIST.map(a => (
-                        <button
-                          type="button"
-                          key={a}
-                          onClick={() => setForm(f => ({ ...f, amenities: f.amenities.includes(a) ? f.amenities.filter(x => x !== a) : [...f.amenities, a] }))}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${form.amenities.includes(a) ? "bg-[#c9a961] text-white border-[#c9a961] shadow-sm" : "bg-white text-[#6c757d] border-[#e9ecef] hover:border-[#c9a961] hover:text-[#c9a961]"}`}
-                        >
-                          {a}
-                        </button>
+                    <div className="space-y-4">
+                      {AMENITIES_GROUPS.map(group => (
+                        <div key={group.label}>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#adb5bd] mb-2">{group.label}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {group.items.map(a => (
+                              <button
+                                type="button"
+                                key={a}
+                                onClick={() => setForm(f => ({ ...f, amenities: f.amenities.includes(a) ? f.amenities.filter(x => x !== a) : [...f.amenities, a] }))}
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${form.amenities.includes(a) ? "bg-[#c9a961] text-white border-[#c9a961] shadow-sm" : "bg-white text-[#6c757d] border-[#e9ecef] hover:border-[#c9a961] hover:text-[#c9a961]"}`}
+                              >
+                                {a}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       ))}
+
+                      {/* Custom amenity input */}
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#adb5bd] mb-2">Custom Amenity</p>
+                        <CustomAmenityInput
+                          onAdd={a => setForm(f => ({ ...f, amenities: f.amenities.includes(a) ? f.amenities : [...f.amenities, a] }))}
+                        />
+                        {/* Show custom amenities (those not in any group) as removable chips */}
+                        {(() => {
+                          const preset = AMENITIES_GROUPS.flatMap(g => g.items);
+                          const custom = form.amenities.filter(a => !preset.includes(a));
+                          return custom.length > 0 ? (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {custom.map(a => (
+                                <span key={a} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[#c9a961] text-white border border-[#c9a961] shadow-sm">
+                                  {a}
+                                  <button
+                                    type="button"
+                                    onClick={() => setForm(f => ({ ...f, amenities: f.amenities.filter(x => x !== a) }))}
+                                    className="hover:opacity-70 transition-opacity"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
                     </div>
                     {form.amenities.length > 0 && (
-                      <p className="text-xs text-[#adb5bd] mt-2">{form.amenities.length} selected</p>
+                      <p className="text-xs text-[#adb5bd] mt-3">{form.amenities.length} amenit{form.amenities.length === 1 ? "y" : "ies"} selected</p>
                     )}
                   </div>
 
