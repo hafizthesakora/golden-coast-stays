@@ -4,12 +4,17 @@ function secretKey() {
   return process.env.BIZIFY_SECRET_KEY ?? "";
 }
 
+function merchantId() {
+  return process.env.BIZIFY_MERCHANT_ID ?? "";
+}
+
 export interface BizifyInitPayload {
   amount: number;
   email: string;
   name?: string;
   description?: string;
   callback_url?: string;
+  currency?: string;
   metadata?: Record<string, string | number>;
 }
 
@@ -29,27 +34,56 @@ export interface BizifyTransaction {
 export async function initializeBizifyPayment(
   payload: BizifyInitPayload
 ): Promise<{ reference: string; checkout_url: string } | null> {
+  const sk = secretKey();
+  const mid = merchantId();
+
+  if (!sk) {
+    console.error("Bizify: BIZIFY_SECRET_KEY is not set");
+    return null;
+  }
+
+  const body = {
+    ...payload,
+    currency: payload.currency ?? "GHS",
+    ...(mid ? { merchant_id: mid } : {}),
+  };
+
   try {
     const res = await fetch(`${BIZIFY_BASE}/payment/initialize`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${secretKey()}`,
+        Authorization: `Bearer ${sk}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
     });
 
+    const raw = await res.text();
+
     if (!res.ok) {
-      const err = await res.text();
-      console.error(`Bizify initialize failed ${res.status}: ${err}`);
+      console.error(`Bizify initialize failed [${res.status}]:`, raw);
       return null;
     }
 
-    const data = await res.json();
-    return {
-      reference: data.data.reference,
-      checkout_url: data.data.checkout_url,
-    };
+    let data: Record<string, unknown>;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      console.error("Bizify initialize: non-JSON response:", raw);
+      return null;
+    }
+
+    // Handle both { data: { reference, checkout_url } } and flat { reference, checkout_url }
+    const payload_data = (data.data ?? data) as Record<string, unknown>;
+    const reference = payload_data.reference as string | undefined;
+    const checkout_url = (payload_data.checkout_url ?? payload_data.checkoutUrl ?? payload_data.payment_url) as string | undefined;
+
+    if (!reference || !checkout_url) {
+      console.error("Bizify initialize: unexpected response shape:", raw);
+      return null;
+    }
+
+    return { reference, checkout_url };
   } catch (err) {
     console.error("initializeBizifyPayment error:", err);
     return null;

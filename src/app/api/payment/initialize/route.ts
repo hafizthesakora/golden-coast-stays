@@ -3,6 +3,24 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { initializeBizifyPayment } from "@/lib/bizify";
 
+// Debug: surface Bizify raw response for easier troubleshooting
+async function probeBizify() {
+  const sk = process.env.BIZIFY_SECRET_KEY;
+  const mid = process.env.BIZIFY_MERCHANT_ID;
+  if (!sk) return { ok: false, error: "BIZIFY_SECRET_KEY not set" };
+  try {
+    const res = await fetch("https://mybizify.com/api/v1/payment/initialize", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${sk}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: 1, email: "test@test.com", currency: "GHS", ...(mid ? { merchant_id: mid } : {}) }),
+    });
+    const text = await res.text();
+    return { ok: res.ok, status: res.status, body: text };
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -56,8 +74,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result) {
+      // Run a probe to surface the real Bizify error in the response (dev/debug only)
+      const probe = await probeBizify();
+      console.error("Bizify probe:", probe);
       return NextResponse.json(
-        { success: false, error: "Payment gateway error. Please try again." },
+        {
+          success: false,
+          error: "Payment gateway error. Please try again.",
+          _debug: process.env.NODE_ENV !== "production" ? probe : undefined,
+        },
         { status: 502 }
       );
     }
