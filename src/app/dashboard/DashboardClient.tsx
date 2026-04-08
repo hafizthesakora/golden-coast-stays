@@ -23,6 +23,7 @@ interface Booking {
   status: string;
   paymentStatus: string;
   property: {
+    id: string;
     title: string;
     city: string;
     slug: string;
@@ -417,6 +418,7 @@ export default function DashboardClient({ user, bookings, favorites, stats }: Pr
             ) : localBookings.map((b) => {
               const img = b.property.images[0]?.imageUrl || "/images/h1.jpg";
               const canCancel = b.status === "pending" || b.status === "confirmed";
+              const isCompleted = b.status === "completed";
               return (
                 <div key={b.id} className={`bg-white rounded-2xl border p-5 shadow-sm flex flex-col sm:flex-row gap-5 transition-opacity ${b.status === "cancelled" ? "opacity-60" : "border-white/80"}`}>
                   <div className="relative w-full sm:w-40 h-28 rounded-xl overflow-hidden flex-shrink-0">
@@ -459,6 +461,13 @@ export default function DashboardClient({ user, bookings, favorites, stats }: Pr
                             {cancellingId === b.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
                             Cancel
                           </button>
+                        )}
+                        {isCompleted && (
+                          <Link href={`/book/${b.property.id}`}>
+                            <Button variant="gold" size="sm" className="gap-1">
+                              Book Again <ArrowRight className="h-3.5 w-3.5" />
+                            </Button>
+                          </Link>
                         )}
                         <Link href={`/stays/${b.property.slug}`}>
                           <Button variant="ghost" size="sm" className="gap-1 text-[#c9a961]">
