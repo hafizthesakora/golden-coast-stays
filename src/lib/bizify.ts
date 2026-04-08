@@ -4,6 +4,10 @@ function secretKey() {
   return process.env.BIZIFY_SECRET_KEY ?? "";
 }
 
+function publicKey() {
+  return process.env.NEXT_PUBLIC_BIZIFY_PUBLIC_KEY ?? "";
+}
+
 function merchantId() {
   return process.env.BIZIFY_MERCHANT_ID ?? "";
 }
@@ -34,11 +38,11 @@ export interface BizifyTransaction {
 export async function initializeBizifyPayment(
   payload: BizifyInitPayload
 ): Promise<{ reference: string; checkout_url: string } | null> {
-  const sk = secretKey();
+  const pk = publicKey();
   const mid = merchantId();
 
-  if (!sk) {
-    console.error("Bizify: BIZIFY_SECRET_KEY is not set");
+  if (!pk) {
+    console.error("Bizify: NEXT_PUBLIC_BIZIFY_PUBLIC_KEY is not set");
     return null;
   }
 
@@ -52,7 +56,7 @@ export async function initializeBizifyPayment(
     const res = await fetch(`${BIZIFY_BASE}/payment/initialize`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${sk}`,
+        Authorization: `Bearer ${pk}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
