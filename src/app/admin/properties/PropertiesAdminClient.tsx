@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
+
+const LocationPicker = dynamic(() => import("@/components/admin/LocationPicker"), { ssr: false });
 import {
   Plus, Search, Edit2, Trash2, Eye, Home, Star, Loader2, X,
   CheckCircle, Upload, ImageIcon, Crown, MapPin, BedDouble,
@@ -877,15 +880,19 @@ export default function PropertiesAdminClient({
                           <input value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} placeholder="e.g. East Legon" className={inputClass} />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-semibold text-[#6c757d] uppercase tracking-wider mb-1.5">Latitude</label>
-                          <input type="number" step="any" value={form.lat} onChange={e => setForm(f => ({ ...f, lat: e.target.value }))} placeholder="5.6037" className={inputClass} />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-[#6c757d] uppercase tracking-wider mb-1.5">Longitude</label>
-                          <input type="number" step="any" value={form.lng} onChange={e => setForm(f => ({ ...f, lng: e.target.value }))} placeholder="-0.1870" className={inputClass} />
-                        </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-[#6c757d] uppercase tracking-wider mb-1.5">Location on Map</label>
+                        <LocationPicker
+                          lat={form.lat}
+                          lng={form.lng}
+                          onSelect={(lat, lng, city, address) => setForm(f => ({
+                            ...f,
+                            lat,
+                            lng,
+                            ...(city ? { city } : {}),
+                            ...(address && !f.address ? { address } : {}),
+                          }))}
+                        />
                       </div>
                     </div>
                   </div>
