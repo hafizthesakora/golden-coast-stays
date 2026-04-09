@@ -1,4 +1,4 @@
-const BIZIFY_BASE = "https://mybizify.com/api/v1";
+const BIZIFY_BASE = "https://www.mybizify.com/api/v1";
 
 function secretKey() {
   return (process.env.BIZIFY_SECRET_KEY ?? "").trim();

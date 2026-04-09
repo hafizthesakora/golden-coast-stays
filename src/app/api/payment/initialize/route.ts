@@ -11,7 +11,7 @@ async function probeBizify() {
   const authHeader = `Bearer ${sk}`;
   console.log(`Bizify probe: sk len=${sk.length} starts="${sk.slice(0, 12)}" header len=${authHeader.length} starts="${authHeader.slice(0, 20)}"`);
   try {
-    const res = await fetch("https://mybizify.com/api/v1/payment/initialize", {
+    const res = await fetch("https://www.mybizify.com/api/v1/payment/initialize", {
       method: "POST",
       headers: { Authorization: authHeader, "Content-Type": "application/json" },
       body: JSON.stringify({ amount: 1, email: "test@test.com", currency: "GHS", ...(mid ? { merchant_id: mid } : {}) }),
