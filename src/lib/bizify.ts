@@ -1,7 +1,7 @@
 const BIZIFY_BASE = "https://mybizify.com/api/v1";
 
 function secretKey() {
-  return process.env.BIZIFY_SECRET_KEY ?? "";
+  return (process.env.BIZIFY_SECRET_KEY ?? "").trim();
 }
 
 function publicKey() {
@@ -52,13 +52,15 @@ export async function initializeBizifyPayment(
     ...(mid ? { merchant_id: mid } : {}),
   };
 
-  console.log(`Bizify initialize: key prefix=${sk.slice(0, 12)}... mid=${mid ? mid.slice(0, 8) + "..." : "none"}`);
+  const authHeader = `Bearer ${sk}`;
+  console.log(`Bizify initialize: key prefix=${sk.slice(0, 12)}... len=${sk.length} mid=${mid ? mid.slice(0, 8) + "..." : "none"}`);
+  console.log(`Bizify auth header length=${authHeader.length} starts="${authHeader.slice(0, 20)}"`);
 
   try {
     const res = await fetch(`${BIZIFY_BASE}/payment/initialize`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${sk}`,
+        Authorization: authHeader,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
