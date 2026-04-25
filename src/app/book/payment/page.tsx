@@ -9,7 +9,7 @@ import {
   ArrowLeft, Calendar, Users, Home, CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency";
 
 interface BookingDetails {
   id: string;
@@ -19,6 +19,7 @@ interface BookingDetails {
   guests: number;
   totalAmount: number;
   nights: number;
+  addonsTotal: number;
   status: string;
   paymentStatus: string;
   property: {
@@ -46,6 +47,7 @@ function PaymentContent() {
   const router = useRouter();
   const reference = searchParams.get("ref");
 
+  const { format: formatMoney } = useCurrency();
   const [booking, setBooking] = useState<BookingDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
@@ -118,18 +120,36 @@ function PaymentContent() {
     </div>
   );
 
-  const nights = booking
-    ? Math.ceil((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / 86400000)
-    : 0;
+  const nights = booking ? booking.nights : 0;
+  const addonsTotal = booking ? Number(booking.addonsTotal) : 0;
   const baseAmount = booking ? Number(booking.property.pricePerNight) * nights : 0;
-  const serviceFee = booking ? Number(booking.totalAmount) - baseAmount : 0;
+  const serviceFee = booking ? Number(booking.totalAmount) - baseAmount - addonsTotal : 0;
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] pt-6 pb-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <Link href="/dashboard" className="inline-flex items-center gap-2 text-[#6c757d] hover:text-[#1a1a1a] text-sm mb-8 transition-colors">
+        <Link href="/dashboard" className="inline-flex items-center gap-2 text-[#6c757d] hover:text-[#1a1a1a] text-sm mb-6 transition-colors">
           <ArrowLeft className="h-4 w-4" /> Back to Dashboard
         </Link>
+
+        {/* Booking Step Indicator */}
+        <div className="flex items-center gap-0 mb-8">
+          {[
+            { n: 1, label: "Your Details", done: true },
+            { n: 2, label: "Payment", active: true },
+            { n: 3, label: "Confirmation" },
+          ].map((step, idx) => (
+            <div key={step.n} className="flex items-center flex-1 last:flex-none">
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 ${step.active ? "bg-[#c9a961] border-[#c9a961] text-white" : step.done ? "bg-[#1a1a1a] border-[#1a1a1a] text-white" : "bg-white border-[#e9ecef] text-[#6c757d]"}`}>
+                  {step.done && !step.active ? <CheckCircle className="h-4 w-4" /> : step.n}
+                </div>
+                <span className={`text-sm font-medium hidden sm:block ${step.active ? "text-[#c9a961]" : step.done ? "text-[#1a1a1a]" : "text-[#6c757d]"}`}>{step.label}</span>
+              </div>
+              {idx < 2 && <div className={`flex-1 h-0.5 mx-3 ${step.done ? "bg-[#1a1a1a]" : "bg-[#e9ecef]"}`} />}
+            </div>
+          ))}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
           {/* Left — Payment */}
@@ -159,7 +179,7 @@ function PaymentContent() {
               <div className="text-center py-5 border-b border-[#f0f0f0] mb-4">
                 <p className="text-[#6c757d] text-sm mb-1">Total Amount</p>
                 <p className="font-['Playfair_Display'] text-4xl font-bold text-[#1a1a1a]">
-                  {booking && formatCurrency(Number(booking.totalAmount))}
+                  {booking && formatMoney(Number(booking.totalAmount))}
                 </p>
                 <p className="text-[#6c757d] text-sm mt-1">
                   Ref: <span className="font-mono text-[#c9a961]">{booking?.reference}</span>
@@ -167,16 +187,22 @@ function PaymentContent() {
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-[#6c757d]">
-                  <span>{booking && formatCurrency(Number(booking.property.pricePerNight))}/night × {nights} nights</span>
-                  <span>{formatCurrency(baseAmount)}</span>
+                  <span>{booking && formatMoney(Number(booking.property.pricePerNight))}/night × {nights} nights</span>
+                  <span>{formatMoney(baseAmount)}</span>
                 </div>
                 <div className="flex justify-between text-[#6c757d]">
                   <span>Service fee (10%)</span>
-                  <span>{formatCurrency(serviceFee)}</span>
+                  <span>{formatMoney(serviceFee)}</span>
                 </div>
+                {addonsTotal > 0 && (
+                  <div className="flex justify-between text-[#c9a961]">
+                    <span>Pre-arrival add-ons</span>
+                    <span>{formatMoney(addonsTotal)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-bold text-[#1a1a1a] pt-2 border-t border-[#f0f0f0]">
                   <span>Total</span>
-                  <span className="text-[#c9a961]">{booking && formatCurrency(Number(booking.totalAmount))}</span>
+                  <span className="text-[#c9a961]">{booking && formatMoney(Number(booking.totalAmount))}</span>
                 </div>
               </div>
             </div>
@@ -189,9 +215,9 @@ function PaymentContent() {
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { label: "Visa / Mastercard / Verve", sub: "Credit & Debit Cards" },
-                  { label: "MTN Mobile Money", sub: "MoMo Prompt" },
-                  { label: "Telecel Cash", sub: "Vodafone Cash" },
-                  { label: "AirtelTigo Money", sub: "Mobile Wallet" },
+                  { label: "MTN Mobile Money", sub: "Approve via MoMo prompt or OTP" },
+                  { label: "Telecel Cash", sub: "Approve via OTP on your phone" },
+                  { label: "AirtelTigo Money", sub: "Approve via OTP on your phone" },
                 ].map(m => (
                   <div key={m.label} className="flex items-center gap-2 p-3 bg-[#f8f9fa] rounded-xl">
                     <div className="w-8 h-8 rounded-lg bg-[#c9a961]/10 flex items-center justify-center flex-shrink-0">
@@ -206,12 +232,23 @@ function PaymentContent() {
               </div>
             </div>
 
+            {/* How Mobile Money works */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p className="text-xs font-semibold text-amber-800 mb-2">📱 Paying with Mobile Money?</p>
+              <ol className="text-xs text-amber-700 space-y-1 list-decimal list-inside">
+                <li>Click Pay below — you&apos;ll be taken to Bizify&apos;s checkout</li>
+                <li>Select MTN MoMo, Telecel Cash, or AirtelTigo</li>
+                <li>Enter your mobile number and approve the prompt on your phone</li>
+                <li>Wait for the OTP SMS and enter it to confirm — do not close the page</li>
+                <li>You&apos;ll be redirected here once payment is confirmed</li>
+              </ol>
+            </div>
+
             {/* What happens */}
             <div className="bg-[#f8f9fa] rounded-xl p-4 flex items-start gap-3">
               <CheckCircle className="h-4 w-4 text-[#c9a961] flex-shrink-0 mt-0.5" />
               <p className="text-xs text-[#6c757d] leading-relaxed">
-                Clicking Pay will take you to Bizify&apos;s secure checkout page where you can choose your preferred payment method.
-                After payment, you will be redirected back here with your confirmed booking.
+                Clicking Pay will take you to Bizify&apos;s secure checkout page. After payment is confirmed, you will be automatically redirected back to your booking confirmation. Do not close the browser until redirected.
               </p>
             </div>
 
@@ -231,7 +268,7 @@ function PaymentContent() {
             >
               {paying
                 ? <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting to Bizify…</>
-                : <><Lock className="h-4 w-4" /> Pay {booking && formatCurrency(Number(booking.totalAmount))} via Bizify</>
+                : <><Lock className="h-4 w-4" /> Pay {booking && formatMoney(Number(booking.totalAmount))} via Bizify</>
               }
             </Button>
 

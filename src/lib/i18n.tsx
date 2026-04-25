@@ -18,9 +18,9 @@ const translations: Record<Lang, Record<string, string>> = {
     nav_started: "Get Started",
 
     /* ── Hero ── */
-    hero_subtitle: "Premium Short-Stay Rentals",
-    hero_title: "Your Perfect Accra Retreat Awaits",
-    hero_desc: "Discover handpicked luxury apartments, villas & serviced residences — crafted for the modern traveller in Ghana.",
+    hero_subtitle: "Trusted Short-Stay Rentals in Accra",
+    hero_title: "Stays You Can Rely On in Accra",
+    hero_desc: "Verified properties with confirmed power, water & WiFi — handpicked for business travellers, families, and diaspora guests across Greater Accra.",
     hero_checkin: "Check In",
     hero_checkout: "Check Out",
     hero_type: "Property Type",

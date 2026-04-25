@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, MapPin, BedDouble, Bath, Users, Star, Eye } from "lucide-react";
+import { Heart, MapPin, BedDouble, Bath, Users, Star, Eye, ShieldCheck, Zap, Droplets, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency";
 
 interface PropertyCardProps {
   id: string;
@@ -24,6 +24,10 @@ interface PropertyCardProps {
   imageUrl?: string;
   rating?: number;
   reviewCount?: number;
+  isVerified?: boolean;
+  hasPower?: boolean;
+  hasWater?: boolean;
+  hasWifi?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (id: string) => void;
 }
@@ -40,6 +44,10 @@ export default function PropertyCard({
   maxGuests,
   featured = false,
   hasVirtualTour = false,
+  isVerified = false,
+  hasPower = false,
+  hasWater = false,
+  hasWifi = false,
   imageUrl,
   rating,
   reviewCount = 0,
@@ -48,6 +56,7 @@ export default function PropertyCard({
 }: PropertyCardProps) {
   const [favorited, setFavorited] = useState(isFavorite);
   const [imgError, setImgError] = useState(false);
+  const { format: formatMoney } = useCurrency();
 
   const fallbackImage = "/images/h1.jpg";
   const displayImage = imgError || !imageUrl ? fallbackImage : imageUrl;
@@ -88,6 +97,11 @@ export default function PropertyCard({
             {hasVirtualTour && (
               <Badge variant="info" className="shadow-md text-xs flex items-center gap-1">
                 <Eye className="h-3 w-3" /> 360°
+              </Badge>
+            )}
+            {isVerified && (
+              <Badge variant="success" className="shadow-md text-xs flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3" /> Verified
               </Badge>
             )}
           </div>
@@ -134,7 +148,7 @@ export default function PropertyCard({
           </div>
 
           {/* Amenities row */}
-          <div className="flex items-center gap-4 text-xs text-[#6c757d] mb-5 pb-5 border-b border-[#f0f0f0]">
+          <div className="flex items-center gap-4 text-xs text-[#6c757d] mb-3 pb-3 border-b border-[#f0f0f0]">
             <span className="flex items-center gap-1.5">
               <BedDouble className="h-3.5 w-3.5 text-[#c9a961]" />
               {bedrooms} bed{bedrooms !== 1 ? "s" : ""}
@@ -149,12 +163,33 @@ export default function PropertyCard({
             </span>
           </div>
 
+          {/* Infrastructure tags */}
+          {(hasPower || hasWater || hasWifi) && (
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              {hasPower && (
+                <span className="flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                  <Zap className="h-2.5 w-2.5" /> Power
+                </span>
+              )}
+              {hasWater && (
+                <span className="flex items-center gap-1 text-[10px] font-medium text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
+                  <Droplets className="h-2.5 w-2.5" /> Water
+                </span>
+              )}
+              {hasWifi && (
+                <span className="flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+                  <Wifi className="h-2.5 w-2.5" /> WiFi
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Price + CTA */}
           <div className="flex items-center justify-between mt-auto">
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="font-['Playfair_Display'] text-xl font-bold text-[#1a1a1a]">
-                  {formatCurrency(pricePerNight)}
+                  {formatMoney(pricePerNight)}
                 </span>
               </div>
               <span className="text-xs text-[#6c757d]">per night</span>

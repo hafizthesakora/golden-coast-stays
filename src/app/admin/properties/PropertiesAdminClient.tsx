@@ -37,6 +37,11 @@ interface Property {
   status: string;
   featured: boolean;
   hasVirtualTour: boolean;
+  isVerified: boolean;
+  verificationLevel: string | null;
+  hasPower: boolean;
+  hasWater: boolean;
+  hasWifi: boolean;
   lodgifyPropertyId: string | null;
   lodgifyRoomTypeId: string | null;
   images: { imageUrl: string }[];
@@ -79,6 +84,7 @@ const emptyForm = {
   bathrooms: "1", maxGuests: "2", area: "", areaUnit: "sqft",
   amenities: [] as string[], featured: false, hasVirtualTour: false,
   virtualTourUrl: "", status: "available", lat: "", lng: "",
+  isVerified: false, verificationLevel: "", hasPower: false, hasWater: false, hasWifi: false,
   lodgifyPropertyId: "", lodgifyRoomTypeId: "",
 };
 
@@ -446,6 +452,11 @@ export default function PropertiesAdminClient({
       bedrooms: String(p.bedrooms), bathrooms: String(p.bathrooms),
       maxGuests: String(p.maxGuests), status: p.status, featured: p.featured,
       hasVirtualTour: p.hasVirtualTour,
+      isVerified: p.isVerified,
+      verificationLevel: p.verificationLevel || "",
+      hasPower: p.hasPower,
+      hasWater: p.hasWater,
+      hasWifi: p.hasWifi,
       lodgifyPropertyId: p.lodgifyPropertyId || "",
       lodgifyRoomTypeId: p.lodgifyRoomTypeId || "",
     });
@@ -1053,6 +1064,47 @@ export default function PropertiesAdminClient({
                     {form.amenities.length > 0 && (
                       <p className="text-xs text-[#adb5bd] mt-3">{form.amenities.length} amenit{form.amenities.length === 1 ? "y" : "ies"} selected</p>
                     )}
+                  </div>
+
+                  {/* Trust & Infrastructure */}
+                  <div>
+                    <SectionHeader icon={CheckCircle} label="Trust & Infrastructure" />
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3 cursor-pointer py-2.5 px-3 rounded-xl border border-[#e9ecef] hover:bg-[#fafafa] transition-colors">
+                        <input type="checkbox" checked={form.isVerified} onChange={e => setForm(f => ({ ...f, isVerified: e.target.checked }))} className="w-4 h-4 accent-[#c9a961]" />
+                        <span className="text-sm font-medium text-[#343a40]">Verified Property</span>
+                        <span className="ml-auto text-xs text-[#c9a961] font-semibold">Shows shield badge</span>
+                      </label>
+                      {form.isVerified && (
+                        <select
+                          value={form.verificationLevel}
+                          onChange={e => setForm(f => ({ ...f, verificationLevel: e.target.value }))}
+                          className={inputClass}
+                        >
+                          <option value="">Select level</option>
+                          <option value="basic">Basic Verified</option>
+                          <option value="standard">Standard Verified</option>
+                          <option value="premium">Premium Verified</option>
+                        </select>
+                      )}
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { key: "hasPower", label: "Stable Power" },
+                          { key: "hasWater", label: "Running Water" },
+                          { key: "hasWifi", label: "WiFi Confirmed" },
+                        ].map(({ key, label }) => (
+                          <label key={key} className="flex items-center gap-2 cursor-pointer py-2 px-3 rounded-xl border border-[#e9ecef] hover:bg-[#fafafa] transition-colors">
+                            <input
+                              type="checkbox"
+                              checked={form[key as keyof typeof form] as boolean}
+                              onChange={e => setForm(f => ({ ...f, [key]: e.target.checked }))}
+                              className="w-4 h-4 accent-[#c9a961]"
+                            />
+                            <span className="text-xs font-medium text-[#343a40]">{label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Virtual Tour */}

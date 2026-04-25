@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Heart, MapPin, BedDouble, Bath, Users, Star, Wifi, Car,
   Waves, Dumbbell, UtensilsCrossed, Tv, Wind, Shield, Check,
-  ChevronLeft, ChevronRight, X, Share2, Eye
+  ChevronLeft, ChevronRight, X, Share2, Eye, ShieldCheck, Zap, Droplets,
+  ConciergeBell, ShoppingBag,
 } from "lucide-react";
+import { useCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -114,6 +116,22 @@ function VirtualTourSection({ embedUrl, title }: { embedUrl: string; title: stri
   );
 }
 
+interface Service {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  category: string;
+}
+
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  transport: <Car className="h-4 w-4" />,
+  catering: <UtensilsCrossed className="h-4 w-4" />,
+  cleaning: <Shield className="h-4 w-4" />,
+  experience: <Star className="h-4 w-4" />,
+  general: <ConciergeBell className="h-4 w-4" />,
+};
+
 const AMENITY_ICONS: Record<string, React.ReactNode> = {
   wifi: <Wifi className="h-4 w-4" />,
   parking: <Car className="h-4 w-4" />,
@@ -155,6 +173,11 @@ interface Property {
   featured: boolean;
   hasVirtualTour: boolean;
   virtualTourUrl: string | null;
+  isVerified: boolean;
+  verificationLevel: string | null;
+  hasPower: boolean;
+  hasWater: boolean;
+  hasWifi: boolean;
   images: PropertyImage[];
   reviews: Review[];
 }
@@ -171,6 +194,10 @@ interface SimilarProperty {
   maxGuests: number;
   featured: boolean;
   hasVirtualTour: boolean;
+  isVerified: boolean;
+  hasPower: boolean;
+  hasWater: boolean;
+  hasWifi: boolean;
   images: { imageUrl: string; isPrimary: boolean }[];
 }
 
@@ -198,12 +225,21 @@ export default function PropertyDetailsClient({
   showReviews = true, showBooking = true, existingBooking = null,
 }: Props) {
   const router = useRouter();
+  const { format: formatMoney } = useCurrency();
   const [favorited, setFavorited] = useState(initialFav);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
   const [nights, setNights] = useState(0);
+  const [services, setServices] = useState<Service[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/services?propertyId=${property.id}`)
+      .then(r => r.json())
+      .then(d => { if (d.services) setServices(d.services); })
+      .catch(() => {});
+  }, [property.id]);
 
   const images = property.images.length > 0 ? property.images : [{ id: "0", imageUrl: "/images/h1.jpg", isPrimary: true }];
   const price = Number(property.pricePerNight);
@@ -283,9 +319,7 @@ export default function PropertyDetailsClient({
                 {images[i] ? (
                   <Image src={images[i].imageUrl} alt={`${property.title} ${i + 1}`} fill className="object-cover group-hover:brightness-90 transition-all" />
                 ) : (
-                  <div className="w-full h-full bg-[#e9ecef] flex items-center justify-center">
-                    <span className="text-[#6c757d] text-sm">No image</span>
-                  </div>
+                  <Image src="/images/h1.jpg" alt={property.title} fill className="object-cover opacity-40" />
                 )}
                 {i === 4 && images.length > 5 && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -310,6 +344,7 @@ export default function PropertyDetailsClient({
                       <Badge variant="gold" className="capitalize">{property.propertyType}</Badge>
                       {property.featured && <Badge variant="dark">✦ Featured</Badge>}
                       {property.hasVirtualTour && <Badge variant="info" className="flex items-center gap-1"><Eye className="h-3 w-3" /> 360° Tour</Badge>}
+                      {property.isVerified && <Badge variant="success" className="flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> Verified{property.verificationLevel ? ` · ${property.verificationLevel.charAt(0).toUpperCase() + property.verificationLevel.slice(1)}` : ""}</Badge>}
                     </div>
                     <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#1a1a1a] mb-2">
                       {property.title}
@@ -349,11 +384,73 @@ export default function PropertyDetailsClient({
                 </div>
               </div>
 
+              {/* Trust & Infrastructure */}
+              {(property.isVerified || property.hasPower || property.hasWater || property.hasWifi) && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5">
+                  <h2 className="font-['Playfair_Display'] text-lg font-semibold text-emerald-900 mb-4 flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-emerald-600" /> Trust & Infrastructure
+                  </h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {property.isVerified && (
+                      <div className="flex items-center gap-2 bg-white rounded-xl p-3 border border-emerald-200">
+                        <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-emerald-900">Verified</p>
+                          <p className="text-[10px] text-emerald-600 capitalize">{property.verificationLevel || "Property"}</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.hasPower && (
+                      <div className="flex items-center gap-2 bg-white rounded-xl p-3 border border-amber-200">
+                        <Zap className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-amber-900">Stable Power</p>
+                          <p className="text-[10px] text-amber-600">24/7 electricity</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.hasWater && (
+                      <div className="flex items-center gap-2 bg-white rounded-xl p-3 border border-blue-200">
+                        <Droplets className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-blue-900">Running Water</p>
+                          <p className="text-[10px] text-blue-600">Reliable supply</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.hasWifi && (
+                      <div className="flex items-center gap-2 bg-white rounded-xl p-3 border border-green-200">
+                        <Wifi className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-green-900">WiFi Confirmed</p>
+                          <p className="text-[10px] text-green-600">High-speed internet</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Description */}
               <div>
                 <h2 className="font-['Playfair_Display'] text-2xl font-semibold text-[#1a1a1a] mb-4">About This Property</h2>
                 <p className="text-[#343a40] leading-relaxed whitespace-pre-line">{property.description}</p>
               </div>
+
+              {/* Virtual Tour — placed above amenities for discovery */}
+              {property.hasVirtualTour && property.virtualTourUrl && (() => {
+                const toEmbedUrl = (url: string): string | null => {
+                  if (!url) return null;
+                  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+                  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
+                  if (url.includes("matterport.com")) return url;
+                  if (url.startsWith("http")) return url;
+                  return null;
+                };
+                const embedUrl = toEmbedUrl(property.virtualTourUrl);
+                if (!embedUrl) return null;
+                return <VirtualTourSection embedUrl={embedUrl} title={property.title} />;
+              })()}
 
               {/* Amenities */}
               {property.amenities?.length > 0 && (
@@ -372,20 +469,40 @@ export default function PropertyDetailsClient({
                 </div>
               )}
 
-              {/* Virtual Tour */}
-              {property.hasVirtualTour && property.virtualTourUrl && (() => {
-                const toEmbedUrl = (url: string): string | null => {
-                  if (!url) return null;
-                  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
-                  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
-                  if (url.includes("matterport.com")) return url;
-                  if (url.startsWith("http")) return url;
-                  return null;
-                };
-                const embedUrl = toEmbedUrl(property.virtualTourUrl);
-                if (!embedUrl) return null;
-                return <VirtualTourSection embedUrl={embedUrl} title={property.title} />;
-              })()}
+              {/* Arrival Experience — pre-bookable services */}
+              {services.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-9 h-9 rounded-xl bg-[#c9a961]/10 flex items-center justify-center">
+                      <ConciergeBell className="h-5 w-5 text-[#c9a961]" />
+                    </div>
+                    <div>
+                      <h2 className="font-['Playfair_Display'] text-2xl font-semibold text-[#1a1a1a] leading-none">Arrival Experience</h2>
+                      <p className="text-[#6c757d] text-xs mt-0.5">Add these during checkout — no surprises on arrival</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {services.map((svc) => (
+                      <div key={svc.id} className="flex items-start gap-3 p-4 rounded-xl bg-[#f8f9fa] border border-[#e9ecef] hover:border-[#c9a961]/40 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-[#c9a961]/10 flex items-center justify-center text-[#c9a961] flex-shrink-0 mt-0.5">
+                          {CATEGORY_ICONS[svc.category] ?? <ShoppingBag className="h-4 w-4" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-semibold text-sm text-[#1a1a1a] leading-tight">{svc.name}</p>
+                            <span className="text-xs font-bold text-[#c9a961] whitespace-nowrap flex-shrink-0">{formatMoney(Number(svc.price))}</span>
+                          </div>
+                          {svc.description && <p className="text-xs text-[#6c757d] mt-0.5 leading-snug line-clamp-2">{svc.description}</p>}
+                          <span className="inline-block mt-1.5 text-[10px] font-medium text-[#6c757d] bg-white border border-[#e9ecef] px-2 py-0.5 rounded-full capitalize">{svc.category}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[#6c757d] mt-3 flex items-center gap-1.5">
+                    <ShoppingBag className="h-3 w-3" /> Select services on the checkout page — paid securely with your booking.
+                  </p>
+                </div>
+              )}
 
               {/* Location */}
               <div>
@@ -440,7 +557,7 @@ export default function PropertyDetailsClient({
               {!showBooking ? (
                 <div className="sticky top-24 lg:top-32 bg-white rounded-2xl shadow-xl border border-[#e9ecef] p-6 text-center">
                   <div className="font-['Playfair_Display'] text-2xl font-bold text-[#1a1a1a] mb-1">
-                    {formatCurrency(property.pricePerNight as unknown as number)}
+                    {formatMoney(Number(property.pricePerNight))}
                     <span className="text-base font-normal text-[#6c757d]"> / night</span>
                   </div>
                   <p className="text-[#6c757d] text-sm mt-3 mb-5">Online booking is not available right now. Please contact us to arrange your stay.</p>
@@ -458,7 +575,7 @@ export default function PropertyDetailsClient({
                 <div className="mb-5">
                   <div className="flex items-baseline gap-1">
                     <span className="font-['Playfair_Display'] text-3xl font-bold text-[#1a1a1a]">
-                      {formatCurrency(price)}
+                      {formatMoney(price)}
                     </span>
                     <span className="text-[#6c757d] text-sm">/ night</span>
                   </div>
@@ -536,16 +653,16 @@ export default function PropertyDetailsClient({
                 {nights > 0 && (
                   <div className="space-y-2 pt-4 border-t border-[#e9ecef] text-sm">
                     <div className="flex justify-between text-[#343a40]">
-                      <span>{formatCurrency(price)} × {nights} night{nights !== 1 ? "s" : ""}</span>
-                      <span>{formatCurrency(price * nights)}</span>
+                      <span>{formatMoney(price)} × {nights} night{nights !== 1 ? "s" : ""}</span>
+                      <span>{formatMoney(price * nights)}</span>
                     </div>
                     <div className="flex justify-between text-[#343a40]">
                       <span>Service fee (10%)</span>
-                      <span>{formatCurrency(serviceFee)}</span>
+                      <span>{formatMoney(serviceFee)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-[#1a1a1a] pt-2 border-t border-[#e9ecef]">
                       <span>Total</span>
-                      <span>{formatCurrency(total)}</span>
+                      <span>{formatMoney(total)}</span>
                     </div>
                   </div>
                 )}
@@ -589,6 +706,10 @@ export default function PropertyDetailsClient({
                     maxGuests={p.maxGuests}
                     featured={p.featured}
                     hasVirtualTour={p.hasVirtualTour}
+                    isVerified={p.isVerified}
+                    hasPower={p.hasPower}
+                    hasWater={p.hasWater}
+                    hasWifi={p.hasWifi}
                     imageUrl={p.images[0]?.imageUrl}
                   />
                 ))}

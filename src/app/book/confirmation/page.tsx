@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
-import { CheckCircle, Calendar, MapPin, Users, Download, ArrowRight } from "lucide-react";
+import { CheckCircle, Calendar, MapPin, Users, Download, ArrowRight, Check } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Metadata } from "next";
 
@@ -31,6 +31,25 @@ export default async function ConfirmationPage({
   return (
     <div className="min-h-screen bg-[#f8f9fa] pt-20">
       <div className="max-w-3xl mx-auto px-6 py-14">
+        {/* Booking Step Indicator */}
+        <div className="flex items-center gap-0 mb-10">
+          {[
+            { n: 1, label: "Your Details", done: true },
+            { n: 2, label: "Payment", done: true },
+            { n: 3, label: "Confirmation", done: true },
+          ].map((step, idx) => (
+            <div key={step.n} className="flex items-center flex-1 last:flex-none">
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 bg-[#1a1a1a] border-[#1a1a1a] text-white">
+                  <Check className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-medium hidden sm:block text-[#1a1a1a]">{step.label}</span>
+              </div>
+              {idx < 2 && <div className="flex-1 h-0.5 mx-3 bg-[#1a1a1a]" />}
+            </div>
+          ))}
+        </div>
+
         {/* Success Header */}
         <div className="text-center mb-10">
           <div className="relative inline-flex">

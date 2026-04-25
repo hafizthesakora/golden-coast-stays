@@ -13,6 +13,10 @@ async function getProperties(filters: {
   min_price?: string;
   max_price?: string;
   bedrooms?: string;
+  has_power?: string;
+  has_water?: string;
+  has_wifi?: string;
+  verified_only?: string;
 }) {
   try {
     const where: Record<string, unknown> = { status: "available" };
@@ -24,6 +28,10 @@ async function getProperties(filters: {
       };
     }
     if (filters.bedrooms) where.bedrooms = { gte: parseInt(filters.bedrooms) };
+    if (filters.has_power === "true") where.hasPower = true;
+    if (filters.has_water === "true") where.hasWater = true;
+    if (filters.has_wifi === "true") where.hasWifi = true;
+    if (filters.verified_only === "true") where.isVerified = true;
 
     return await prisma.property.findMany({
       where,
@@ -39,6 +47,11 @@ async function getProperties(filters: {
         maxGuests: true,
         featured: true,
         hasVirtualTour: true,
+        isVerified: true,
+        verificationLevel: true,
+        hasPower: true,
+        hasWater: true,
+        hasWifi: true,
         images: { orderBy: [{ isPrimary: "desc" }, { order: "asc" }], take: 1 },
         reviews: { where: { isApproved: true }, select: { rating: true } },
       },

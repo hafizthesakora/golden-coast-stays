@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
       propertyId, checkIn, checkOut, guests, nights,
       pricePerNight, totalAmount, guestName, guestEmail,
       guestPhone, specialRequests,
+      selectedServices, // [{ serviceId, quantity }]
     } = body;
 
     if (!propertyId || !checkIn || !checkOut || nights < 1) {
@@ -61,6 +62,26 @@ export async function POST(req: NextRequest) {
 
     const reference = generateBookingRef();
 
+    // Calculate addons total from submitted services
+    let addonsTotal = 0;
+    const serviceLines: { serviceId: string; quantity: number; unitPrice: number }[] = [];
+
+    if (Array.isArray(selectedServices) && selectedServices.length > 0) {
+      const serviceIds = selectedServices.map((s: { serviceId: string; quantity: number }) => s.serviceId);
+      const dbServices = await prisma.service.findMany({
+        where: { id: { in: serviceIds }, propertyId, isActive: true },
+        select: { id: true, price: true },
+      });
+      const priceMap = Object.fromEntries(dbServices.map(s => [s.id, Number(s.price)]));
+      for (const item of selectedServices as { serviceId: string; quantity: number }[]) {
+        const unitPrice = priceMap[item.serviceId];
+        if (unitPrice != null && item.quantity > 0) {
+          addonsTotal += unitPrice * item.quantity;
+          serviceLines.push({ serviceId: item.serviceId, quantity: item.quantity, unitPrice });
+        }
+      }
+    }
+
     const booking = await prisma.booking.create({
       data: {
         reference,
@@ -74,12 +95,25 @@ export async function POST(req: NextRequest) {
         guests,
         nights,
         pricePerNight,
-        totalAmount,
+        totalAmount: Number(totalAmount) + addonsTotal,
+        addonsTotal,
         specialRequests: specialRequests || null,
         status: "pending",
         paymentStatus: "pending",
       },
     });
+
+    // Create BookingService records
+    if (serviceLines.length > 0) {
+      await prisma.bookingService.createMany({
+        data: serviceLines.map(line => ({
+          bookingId: booking.id,
+          serviceId: line.serviceId,
+          quantity: line.quantity,
+          unitPrice: line.unitPrice,
+        })),
+      });
+    }
 
     // ── Notifications ─────────────────────────────────────────────────────
     const notifTitle = `New Booking — ${property.title}`;

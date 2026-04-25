@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { I18nProvider } from "@/lib/i18n";
+import { CurrencyProvider } from "@/lib/currency";
 
 export const metadata: Metadata = {
   title: {
@@ -35,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <SessionProvider><I18nProvider>{children}</I18nProvider></SessionProvider>
+        <SessionProvider><I18nProvider><CurrencyProvider>{children}</CurrencyProvider></I18nProvider></SessionProvider>
       </body>
     </html>
   );

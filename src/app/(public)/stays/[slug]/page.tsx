@@ -45,7 +45,7 @@ export default async function PropertyDetailsPage({ params }: { params: Promise<
     select: {
       id: true, title: true, slug: true, city: true, propertyType: true,
       pricePerNight: true, bedrooms: true, bathrooms: true, maxGuests: true,
-      featured: true, hasVirtualTour: true,
+      featured: true, hasVirtualTour: true, isVerified: true, hasPower: true, hasWater: true, hasWifi: true,
       images: { orderBy: [{ isPrimary: "desc" }], take: 1 },
     },
     orderBy: [{ featured: "desc" }],

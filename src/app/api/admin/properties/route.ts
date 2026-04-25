@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, slug, description, propertyType, city, address, pricePerNight, bedrooms, bathrooms, maxGuests, area, areaUnit, amenities, featured, hasVirtualTour, virtualTourUrl, status, lat, lng } = body;
+    const { title, slug, description, propertyType, city, address, pricePerNight, bedrooms, bathrooms, maxGuests, area, areaUnit, amenities, featured, hasVirtualTour, virtualTourUrl, status, lat, lng, isVerified, verificationLevel, hasPower, hasWater, hasWifi } = body;
 
     if (!title || !slug || !city || !pricePerNight) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -30,6 +30,11 @@ export async function POST(req: NextRequest) {
         amenities: amenities || [], featured: featured || false,
         hasVirtualTour: hasVirtualTour || false, virtualTourUrl: virtualTourUrl || null,
         status: status || "available",
+        isVerified: isVerified ?? false,
+        verificationLevel: verificationLevel || null,
+        hasPower: hasPower ?? false,
+        hasWater: hasWater ?? false,
+        hasWifi: hasWifi ?? false,
         lat: lat ? Number(lat) : null, lng: lng ? Number(lng) : null,
       },
     });

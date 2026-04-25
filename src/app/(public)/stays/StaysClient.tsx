@@ -20,6 +20,11 @@ interface Property {
   maxGuests: number;
   featured: boolean;
   hasVirtualTour: boolean;
+  isVerified: boolean;
+  verificationLevel: string | null;
+  hasPower: boolean;
+  hasWater: boolean;
+  hasWifi: boolean;
   images: { imageUrl: string; isPrimary: boolean }[];
   reviews: { rating: number }[];
 }
@@ -60,6 +65,10 @@ export default function StaysClient({
     check_in: filters.check_in || "",
     check_out: filters.check_out || "",
     guests: filters.guests || "",
+    has_power: filters.has_power || "",
+    has_water: filters.has_water || "",
+    has_wifi: filters.has_wifi || "",
+    verified_only: filters.verified_only || "",
   });
 
   const applyFilters = () => {
@@ -69,7 +78,7 @@ export default function StaysClient({
   };
 
   const clearFilters = () => {
-    setLocalFilters({ property_type: "", min_price: "", max_price: "", bedrooms: "", check_in: "", check_out: "", guests: "" });
+    setLocalFilters({ property_type: "", min_price: "", max_price: "", bedrooms: "", check_in: "", check_out: "", guests: "", has_power: "", has_water: "", has_wifi: "", verified_only: "" });
     router.push("/stays");
   };
 
@@ -150,50 +159,70 @@ export default function StaysClient({
 
           {/* Expanded filters */}
           {showFilters && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-[#e9ecef] mt-3">
-              <div>
-                <label className="block text-xs font-medium text-[#6c757d] mb-1">{t("stays_type")}</label>
-                <select
-                  value={localFilters.property_type}
-                  onChange={(e) => setLocalFilters(f => ({ ...f, property_type: e.target.value }))}
-                  className="w-full h-10 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961] bg-white"
-                >
-                  {PROPERTY_TYPES.map(t => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
-                </select>
+            <div className="pt-3 border-t border-[#e9ecef] mt-3 space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#6c757d] mb-1">{t("stays_type")}</label>
+                  <select
+                    value={localFilters.property_type}
+                    onChange={(e) => setLocalFilters(f => ({ ...f, property_type: e.target.value }))}
+                    className="w-full h-10 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961] bg-white"
+                  >
+                    {PROPERTY_TYPES.map(t => (
+                      <option key={t.value} value={t.value}>{t.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#6c757d] mb-1">{t("stays_min_price")}</label>
+                  <input
+                    type="number" min={0}
+                    value={localFilters.min_price}
+                    onChange={(e) => setLocalFilters(f => ({ ...f, min_price: e.target.value }))}
+                    placeholder="0"
+                    className="w-full h-10 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#6c757d] mb-1">{t("stays_max_price")}</label>
+                  <input
+                    type="number" min={0}
+                    value={localFilters.max_price}
+                    onChange={(e) => setLocalFilters(f => ({ ...f, max_price: e.target.value }))}
+                    placeholder="Any"
+                    className="w-full h-10 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#6c757d] mb-1">{t("stays_bedrooms")}</label>
+                  <select
+                    value={localFilters.bedrooms}
+                    onChange={(e) => setLocalFilters(f => ({ ...f, bedrooms: e.target.value }))}
+                    className="w-full h-10 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961] bg-white"
+                  >
+                    {BEDROOM_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-[#6c757d] mb-1">{t("stays_min_price")}</label>
-                <input
-                  type="number" min={0}
-                  value={localFilters.min_price}
-                  onChange={(e) => setLocalFilters(f => ({ ...f, min_price: e.target.value }))}
-                  placeholder="0"
-                  className="w-full h-10 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#6c757d] mb-1">{t("stays_max_price")}</label>
-                <input
-                  type="number" min={0}
-                  value={localFilters.max_price}
-                  onChange={(e) => setLocalFilters(f => ({ ...f, max_price: e.target.value }))}
-                  placeholder="Any"
-                  className="w-full h-10 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#6c757d] mb-1">{t("stays_bedrooms")}</label>
-                <select
-                  value={localFilters.bedrooms}
-                  onChange={(e) => setLocalFilters(f => ({ ...f, bedrooms: e.target.value }))}
-                  className="w-full h-10 px-3 rounded-xl border border-[#e9ecef] text-sm focus:outline-none focus:border-[#c9a961] bg-white"
-                >
-                  {BEDROOM_OPTIONS.map(o => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
+              {/* Infrastructure filters */}
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs font-medium text-[#6c757d] self-center">Infrastructure:</span>
+                {[
+                  { key: "verified_only", label: "✓ Verified Only" },
+                  { key: "has_power", label: "⚡ Stable Power" },
+                  { key: "has_water", label: "💧 Running Water" },
+                  { key: "has_wifi", label: "📶 WiFi Confirmed" },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setLocalFilters(f => ({ ...f, [key]: f[key as keyof typeof f] === "true" ? "" : "true" }))}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${localFilters[key as keyof typeof localFilters] === "true" ? "bg-[#c9a961] border-[#c9a961] text-white" : "bg-white border-[#e9ecef] text-[#6c757d] hover:border-[#c9a961]"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -236,6 +265,10 @@ export default function StaysClient({
                   maxGuests={p.maxGuests}
                   featured={p.featured}
                   hasVirtualTour={p.hasVirtualTour}
+                  isVerified={p.isVerified}
+                  hasPower={p.hasPower}
+                  hasWater={p.hasWater}
+                  hasWifi={p.hasWifi}
                   imageUrl={primaryImage}
                   rating={rating}
                   reviewCount={p.reviews.length}

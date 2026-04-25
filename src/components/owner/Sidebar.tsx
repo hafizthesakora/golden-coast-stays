@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Home, Calendar, DollarSign, FileText, Globe, PlusCircle,
-  ChevronLeft, Menu, LogOut, ExternalLink, Bell, Search, X,
+  ChevronLeft, Menu, LogOut, ExternalLink, Bell, Search, X, ShoppingBag,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -14,6 +14,7 @@ const navItems = [
   { href: "/owner/properties",  label: "My Properties",   icon: Home },
   { href: "/owner/bookings",    label: "Bookings",        icon: Calendar },
   { href: "/owner/revenue",     label: "Revenue",         icon: DollarSign },
+  { href: "/owner/services",    label: "Services",        icon: ShoppingBag },
   { href: "/owner/submissions", label: "My Submissions",  icon: FileText },
   { href: "/owner/tours",       label: "Virtual Tours",   icon: Globe },
   { href: "/owner/submit",      label: "Submit Property", icon: PlusCircle },

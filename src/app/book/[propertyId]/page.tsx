@@ -35,9 +35,10 @@ export default async function BookingPage({
         where: { id: sp.booking_id },
         select: {
           id: true, reference: true, checkIn: true, checkOut: true,
-          guests: true, guestName: true, guestEmail: true, guestPhone: true, specialRequests: true,
+          guests: true, nights: true, totalAmount: true,
+          guestName: true, guestEmail: true, guestPhone: true, specialRequests: true,
         },
-      }).then((b: { id: string; reference: string; checkIn: Date; checkOut: Date; guests: number; guestName: string | null; guestEmail: string | null; guestPhone: string | null; specialRequests: string | null } | null) => (b && b.id ? b : null))
+      }).then((b: { id: string; reference: string; checkIn: Date; checkOut: Date; guests: number; nights: number; totalAmount: unknown; guestName: string | null; guestEmail: string | null; guestPhone: string | null; specialRequests: string | null } | null) => (b && b.id ? b : null))
     : null;
 
   // Get booked ranges — prefer Lodgify, fall back to local DB
