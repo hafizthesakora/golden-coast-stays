@@ -33,8 +33,20 @@ const CurrencyContext = createContext<CurrencyContextType>({
   format: (v) => `GH₵${v.toLocaleString()}`,
 });
 
+function detectCurrency(): Currency {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz.startsWith("Africa")) return "GHS";
+    const locale = navigator.language || "";
+    if (locale.startsWith("en-GB") || locale.startsWith("en-IE")) return "GBP";
+    return "USD";
+  } catch {
+    return "GHS";
+  }
+}
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrency] = useState<Currency>("GHS");
+  const [currency, setCurrency] = useState<Currency>(detectCurrency);
 
   const convert = (ghs: number) => {
     const rate = RATES[currency];

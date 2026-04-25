@@ -7,6 +7,7 @@ import PanoramaHeader from "@/components/stays/PanoramaHeader";
 import { SlidersHorizontal, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { useCurrency, type Currency } from "@/lib/currency";
 
 interface Property {
   id: string;
@@ -56,6 +57,7 @@ export default function StaysClient({
 }) {
   const router = useRouter();
   const { t } = useI18n();
+  const { currency, setCurrency } = useCurrency();
   const [showFilters, setShowFilters] = useState(false);
   const [localFilters, setLocalFilters] = useState({
     property_type: filters.property_type || "",
@@ -155,6 +157,19 @@ export default function StaysClient({
             <span className="ml-auto text-sm text-[#6c757d]">
               {properties.length} {properties.length === 1 ? t("stays_found_one") : t("stays_found_many")}
             </span>
+
+            {/* Currency Switcher */}
+            <div className="flex items-center rounded-full border border-[#e9ecef] overflow-hidden text-xs font-semibold flex-shrink-0">
+              {(["GHS", "USD", "GBP"] as Currency[]).map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCurrency(c)}
+                  className={`px-2.5 py-1.5 transition-colors ${currency === c ? "bg-[#c9a961] text-white" : "text-[#6c757d] hover:text-[#1a1a1a]"}`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Expanded filters */}

@@ -12,7 +12,6 @@ import {
   Settings, Phone, MapPin, Globe, Home, Building2, LayoutDashboard,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { useCurrency, type Currency } from "@/lib/currency";
 
 // Nav for guests who are NOT logged in
 const PUBLIC_NAV = [
@@ -44,7 +43,6 @@ export default function Navbar() {
   const pathname                        = usePathname();
   const { data: session, status }       = useSession();
   const { lang, setLang, langs, t }     = useI18n();
-  const { currency, setCurrency }       = useCurrency();
   const userMenuRef                     = useRef<HTMLDivElement>(null);
   const langMenuRef                     = useRef<HTMLDivElement>(null);
 
@@ -182,27 +180,6 @@ export default function Navbar() {
 
           {/* Desktop Right Side */}
           <div className="hidden xl:flex items-center gap-3">
-            {/* Currency Switcher */}
-            <div className="flex items-center rounded-full border border-white/20 overflow-hidden text-xs font-semibold"
-              style={{ borderColor: isScrolled || !isHome ? "#e9ecef" : "rgba(255,255,255,0.2)" }}>
-              {(["GHS", "USD", "GBP"] as Currency[]).map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCurrency(c)}
-                  className={cn(
-                    "px-2.5 py-1.5 transition-colors",
-                    currency === c
-                      ? "bg-[#c9a961] text-white"
-                      : isScrolled || !isHome
-                        ? "text-[#6c757d] hover:text-[#1a1a1a]"
-                        : "text-white/60 hover:text-white"
-                  )}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-
             {/* Language Switcher */}
             <div className="relative" ref={langMenuRef}>
               <button

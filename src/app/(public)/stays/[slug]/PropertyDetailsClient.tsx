@@ -8,7 +8,7 @@ import {
   Heart, MapPin, BedDouble, Bath, Users, Star, Wifi, Car,
   Waves, Dumbbell, UtensilsCrossed, Tv, Wind, Shield, Check,
   ChevronLeft, ChevronRight, X, Share2, Eye, ShieldCheck, Zap, Droplets,
-  ConciergeBell, ShoppingBag,
+  ConciergeBell, ShoppingBag, Laptop, Heart as HeartIcon, CalendarDays, PartyPopper,
 } from "lucide-react";
 import { useCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
@@ -131,6 +131,22 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   experience: <Star className="h-4 w-4" />,
   general: <ConciergeBell className="h-4 w-4" />,
 };
+
+function getBestForTags(property: {
+  bedrooms: number; maxGuests: number; hasWifi: boolean; amenities: string[];
+}) {
+  const tags: { icon: React.ReactNode; label: string; desc: string }[] = [];
+  if (property.hasWifi) tags.push({ icon: <Laptop className="h-4 w-4" />, label: "Remote Work", desc: "High-speed WiFi confirmed" });
+  if (property.bedrooms >= 3 || property.maxGuests >= 5) tags.push({ icon: <Users className="h-4 w-4" />, label: "Families", desc: `Up to ${property.maxGuests} guests` });
+  if (property.bedrooms <= 2 && property.maxGuests <= 4) tags.push({ icon: <HeartIcon className="h-4 w-4" />, label: "Couples", desc: "Intimate & private setting" });
+  if (property.maxGuests >= 6) tags.push({ icon: <PartyPopper className="h-4 w-4" />, label: "Group Getaways", desc: `Fits up to ${property.maxGuests} guests` });
+  const amenityStr = property.amenities.join(" ").toLowerCase();
+  if (amenityStr.includes("pool") || amenityStr.includes("beach") || amenityStr.includes("ocean")) {
+    tags.push({ icon: <Waves className="h-4 w-4" />, label: "Leisure & Relaxation", desc: "Pool or beach access" });
+  }
+  tags.push({ icon: <CalendarDays className="h-4 w-4" />, label: "Short Stays", desc: "Flexible check-in options" });
+  return tags.slice(0, 4);
+}
 
 const AMENITY_ICONS: Record<string, React.ReactNode> = {
   wifi: <Wifi className="h-4 w-4" />,
@@ -436,6 +452,30 @@ export default function PropertyDetailsClient({
                 <h2 className="font-['Playfair_Display'] text-2xl font-semibold text-[#1a1a1a] mb-4">About This Property</h2>
                 <p className="text-[#343a40] leading-relaxed whitespace-pre-line">{property.description}</p>
               </div>
+
+              {/* Best For */}
+              {(() => {
+                const tags = getBestForTags(property);
+                if (!tags.length) return null;
+                return (
+                  <div>
+                    <h2 className="font-['Playfair_Display'] text-2xl font-semibold text-[#1a1a1a] mb-4">Best For</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {tags.map((tag) => (
+                        <div key={tag.label} className="flex flex-col items-center text-center gap-2 p-4 rounded-2xl bg-[#f8f9fa] border border-[#e9ecef] hover:border-[#c9a961]/40 transition-colors">
+                          <div className="w-9 h-9 rounded-xl bg-[#c9a961]/10 flex items-center justify-center text-[#c9a961]">
+                            {tag.icon}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-[#1a1a1a] leading-tight">{tag.label}</p>
+                            <p className="text-[10px] text-[#6c757d] mt-0.5 leading-snug">{tag.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Virtual Tour — placed above amenities for discovery */}
               {property.hasVirtualTour && property.virtualTourUrl && (() => {

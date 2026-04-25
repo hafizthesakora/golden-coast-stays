@@ -291,6 +291,11 @@ function CustomAmenityInput({ onAdd }: { onAdd: (a: string) => void }) {
     if (!trimmed) return;
     onAdd(trimmed);
     setVal("");
+    fetch("/api/admin/suggested-amenities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: trimmed }),
+    }).catch(() => {});
   }
   return (
     <div className="flex gap-2">
@@ -1068,42 +1073,78 @@ export default function PropertiesAdminClient({
 
                   {/* Trust & Infrastructure */}
                   <div>
-                    <SectionHeader icon={CheckCircle} label="Trust & Infrastructure" />
-                    <div className="space-y-3">
-                      <label className="flex items-center gap-3 cursor-pointer py-2.5 px-3 rounded-xl border border-[#e9ecef] hover:bg-[#fafafa] transition-colors">
-                        <input type="checkbox" checked={form.isVerified} onChange={e => setForm(f => ({ ...f, isVerified: e.target.checked }))} className="w-4 h-4 accent-[#c9a961]" />
-                        <span className="text-sm font-medium text-[#343a40]">Verified Property</span>
-                        <span className="ml-auto text-xs text-[#c9a961] font-semibold">Shows shield badge</span>
-                      </label>
-                      {form.isVerified && (
-                        <select
-                          value={form.verificationLevel}
-                          onChange={e => setForm(f => ({ ...f, verificationLevel: e.target.value }))}
-                          className={inputClass}
-                        >
-                          <option value="">Select level</option>
-                          <option value="basic">Basic Verified</option>
-                          <option value="standard">Standard Verified</option>
-                          <option value="premium">Premium Verified</option>
-                        </select>
-                      )}
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { key: "hasPower", label: "Stable Power" },
-                          { key: "hasWater", label: "Running Water" },
-                          { key: "hasWifi", label: "WiFi Confirmed" },
-                        ].map(({ key, label }) => (
-                          <label key={key} className="flex items-center gap-2 cursor-pointer py-2 px-3 rounded-xl border border-[#e9ecef] hover:bg-[#fafafa] transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={form[key as keyof typeof form] as boolean}
-                              onChange={e => setForm(f => ({ ...f, [key]: e.target.checked }))}
-                              className="w-4 h-4 accent-[#c9a961]"
-                            />
-                            <span className="text-xs font-medium text-[#343a40]">{label}</span>
-                          </label>
-                        ))}
+                    <SectionHeader icon={CheckCircle} label="Verification Checklist" />
+                    <div className="space-y-4">
+
+                      {/* Verification status */}
+                      <div className="bg-[#f8f9fa] rounded-xl p-4 space-y-3">
+                        <p className="text-xs font-semibold text-[#6c757d] uppercase tracking-wider">Verification Status</p>
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input type="checkbox" checked={form.isVerified} onChange={e => setForm(f => ({ ...f, isVerified: e.target.checked }))} className="w-4 h-4 accent-[#c9a961]" />
+                          <span className="text-sm font-medium text-[#343a40]">Mark as Verified Property</span>
+                          <span className="ml-auto text-xs text-[#c9a961] font-semibold bg-[#c9a961]/10 px-2 py-0.5 rounded-full">Shows shield badge</span>
+                        </label>
+                        {form.isVerified && (
+                          <select
+                            value={form.verificationLevel}
+                            onChange={e => setForm(f => ({ ...f, verificationLevel: e.target.value }))}
+                            className={inputClass}
+                          >
+                            <option value="">Select verification level</option>
+                            <option value="basic">Basic — Photos + address confirmed</option>
+                            <option value="standard">Standard — In-person inspection done</option>
+                            <option value="premium">Premium — Full audit + utilities tested</option>
+                          </select>
+                        )}
                       </div>
+
+                      {/* Utilities checklist */}
+                      <div className="bg-[#f8f9fa] rounded-xl p-4 space-y-3">
+                        <p className="text-xs font-semibold text-[#6c757d] uppercase tracking-wider">Confirmed Utilities</p>
+                        <p className="text-[11px] text-[#6c757d]">Only check what has been physically tested during inspection.</p>
+                        <div className="space-y-2">
+                          {[
+                            { key: "hasPower", label: "Stable Power Supply", desc: "24/7 electricity or reliable generator/solar backup" },
+                            { key: "hasWater", label: "Running Water", desc: "Consistent pipe or borehole water supply confirmed" },
+                            { key: "hasWifi", label: "High-Speed WiFi", desc: "Fibre or strong LTE — speed tested on-site" },
+                          ].map(({ key, label, desc }) => (
+                            <label key={key} className="flex items-start gap-3 cursor-pointer py-2.5 px-3 rounded-xl border border-[#e9ecef] hover:bg-white transition-colors">
+                              <input
+                                type="checkbox"
+                                checked={form[key as keyof typeof form] as boolean}
+                                onChange={e => setForm(f => ({ ...f, [key]: e.target.checked }))}
+                                className="w-4 h-4 accent-[#c9a961] mt-0.5 flex-shrink-0"
+                              />
+                              <div>
+                                <p className="text-sm font-medium text-[#343a40]">{label}</p>
+                                <p className="text-[11px] text-[#6c757d]">{desc}</p>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Physical inspection checklist */}
+                      <div className="bg-[#f8f9fa] rounded-xl p-4 space-y-3">
+                        <p className="text-xs font-semibold text-[#6c757d] uppercase tracking-wider">Inspection Checklist</p>
+                        <p className="text-[11px] text-[#adb5bd]">For internal records — does not affect public listing.</p>
+                        <div className="space-y-1.5">
+                          {[
+                            "Photos match actual property",
+                            "Address and location verified",
+                            "Owner ID / title documents sighted",
+                            "Keys or access method confirmed",
+                            "Security situation assessed",
+                            "Cleanliness standards meet GCS policy",
+                          ].map((item) => (
+                            <label key={item} className="flex items-center gap-2.5 cursor-pointer text-sm text-[#343a40] py-1">
+                              <input type="checkbox" className="w-3.5 h-3.5 accent-[#c9a961]" />
+                              {item}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
                     </div>
                   </div>
 

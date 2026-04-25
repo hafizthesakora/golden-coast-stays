@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Ground mound -->
+  <ellipse cx="50" cy="88" rx="22" ry="7" fill="#c9a961"/>
+
+  <!-- Back palm trunk (shorter, leaning right) -->
+  <path d="M50 84 Q58 68 62 48" stroke="#c9a961" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+  <!-- Back palm fronds -->
+  <path d="M62 48 Q74 36 78 28" stroke="#c9a961" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M62 48 Q70 40 76 36" stroke="#c9a961" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M62 48 Q68 44 72 44" stroke="#c9a961" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M62 48 Q64 38 62 30" stroke="#c9a961" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M62 48 Q56 40 54 34" stroke="#c9a961" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+  <!-- Front palm trunk (taller, slight lean left) -->
+  <path d="M50 84 Q44 64 40 38" stroke="#D4AF37" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- Front palm fronds -->
+  <path d="M40 38 Q24 24 18 14" stroke="#D4AF37" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M40 38 Q28 26 26 18" stroke="#D4AF37" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M40 38 Q34 22 34 12" stroke="#D4AF37" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M40 38 Q44 22 46 12" stroke="#D4AF37" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M40 38 Q52 26 58 20" stroke="#D4AF37" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M40 38 Q54 32 62 30" stroke="#D4AF37" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>

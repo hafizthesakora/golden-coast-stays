@@ -379,6 +379,17 @@ model BookingService {
   @@map("booking_services")
 }
 
+model SuggestedAmenity {
+  id        String   @id @default(cuid())
+  name      String
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name])
+  @@map("suggested_amenities")
+}
+
 model OwnerWallet {
   id            String   @id @default(cuid())
   userId        String   @unique

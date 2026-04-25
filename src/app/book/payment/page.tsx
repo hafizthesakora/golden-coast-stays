@@ -164,13 +164,35 @@ function PaymentContent() {
               <h1 className="font-['Playfair_Display'] text-3xl font-bold text-[#1a1a1a]">Complete Your Booking</h1>
             </div>
 
-            {/* Security badge */}
-            <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4">
-              <Lock className="h-5 w-5 text-green-600 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-semibold text-green-800">256-bit SSL Secured</p>
-                <p className="text-xs text-green-600">Your payment is processed securely by Bizify. We never see your card details.</p>
+            {/* Trust badges */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Lock className="h-4 w-4 text-green-600 flex-shrink-0" />
+                <p className="text-sm font-semibold text-green-800">256-bit SSL · Secure Checkout</p>
               </div>
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Bizify badge */}
+                <div className="flex items-center gap-1.5 bg-white border border-green-200 rounded-lg px-3 py-1.5">
+                  <div className="w-5 h-5 rounded-md bg-[#1a1a1a] flex items-center justify-center flex-shrink-0">
+                    <span className="text-[8px] font-black text-[#c9a961]">B</span>
+                  </div>
+                  <span className="text-xs font-bold text-[#1a1a1a]">Bizify</span>
+                  <span className="text-[10px] text-green-600 font-medium">· Verified</span>
+                </div>
+                {/* MoMo badge */}
+                <div className="flex items-center gap-1.5 bg-white border border-green-200 rounded-lg px-3 py-1.5">
+                  <div className="w-5 h-5 rounded-md bg-yellow-400 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[7px] font-black text-black">MTN</span>
+                  </div>
+                  <span className="text-xs font-bold text-[#1a1a1a]">MoMo</span>
+                </div>
+                {/* Card badge */}
+                <div className="flex items-center gap-1.5 bg-white border border-green-200 rounded-lg px-3 py-1.5">
+                  <CreditCard className="h-4 w-4 text-[#1a69c4]" />
+                  <span className="text-xs font-bold text-[#1a1a1a]">Visa / Mastercard</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-green-600">Your card details are handled entirely by Bizify — Golden Coast Stay never sees or stores them.</p>
             </div>
 
             {/* Amount breakdown */}
